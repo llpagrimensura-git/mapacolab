@@ -1,4 +1,4 @@
-# Mapa #Encuentro · Santa Fe
+# MAPACOLAB - #Encuentro
 
 Mapa colaborativo para el #Encuentro: la gente toca un punto en el mapa, cuenta qué pasa ahí y el aporte se guarda en una planilla de Google Sheets. Después se puede ver todo en un mapa en vivo, en una tabla cruda o en gráficos.
 
