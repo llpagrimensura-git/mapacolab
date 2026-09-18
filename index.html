@@ -150,7 +150,6 @@ main{flex:1;position:relative;overflow:hidden}
 .feed p{margin:0;font-size:13.5px;line-height:1.3}
 .feed small{color:var(--ink-soft);font-size:11.5px}
 .empty{padding:6px 13px 14px;color:var(--ink-soft);font-size:13.5px}
-.empty button{margin-top:8px;border:1px dashed var(--ink-soft);background:none;border-radius:10px;padding:7px 11px;font-size:13px}
 
 /* ---------- sheet / modal ---------- */
 .scrim{position:fixed;inset:0;background:rgba(10,28,35,.44);z-index:60;display:none}
@@ -406,11 +405,11 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     <div class="row" id="icons"></div>
 
     <label class="f" for="txt">Qué querés contar <span>· hasta 280 caracteres</span></label>
-    <textarea id="txt" rows="3" maxlength="280" placeholder="Acá falta una rampa para sillas de ruedas."></textarea>
+    <textarea id="txt" rows="3" maxlength="280" placeholder="Contá qué pasa en este lugar…"></textarea>
     <div class="count" id="count">0 / 280</div>
 
     <label class="f" for="who">Tu nombre <span>· opcional</span></label>
-    <input type="text" id="who" maxlength="40" placeholder="Fernanda, del barrio Candioti">
+    <input type="text" id="who" maxlength="40" placeholder="Tu nombre o el de tu organización">
     <div class="check"><input type="checkbox" id="anon" checked><label for="anon">Publicar de forma anónima</label></div>
 
     <button class="cta" id="send">Publicar punto</button>
@@ -445,15 +444,15 @@ const CONFIG = {
 
 const HAS_API = () => !!CONFIG.API && /^https?:\/\//.test(CONFIG.API);
 
-/* ---------------- datos base ---------------- */
+/* ---------------- temáticas e íconos ---------------- */
 const THEMES = [
-  {id:"educacion",  name:"Educación",      color:"#3C6CE0", icon:"🎓", icons:["🎓","📚","🏫","✏️"]},
-  {id:"alimentacion",name:"Alimentación",  color:"#E08A1F", icon:"🍅", icons:["🍅","🥖","🍲","🛒"]},
-  {id:"infra",      name:"Infraestructura",color:"#6A6F8C", icon:"🚧", icons:["🚧","💡","🚰","🕳️"]},
-  {id:"movilidad",  name:"Movilidad",      color:"#159E8B", icon:"🚲", icons:["🚲","🚌","🚶","♿"]},
-  {id:"verdes",     name:"Espacios verdes",color:"#4C9A2A", icon:"🌳", icons:["🌳","🛝","🐕","🌊"]},
-  {id:"salud",      name:"Salud",          color:"#D7365E", icon:"🩺", icons:["🩺","💊","🏥","🦷"]},
-  {id:"otro",       name:"Otro",           color:"#5A6B72", icon:"📍", icons:["📍","⭐","❗","💬"]}
+  {id:"ciudad",    name:"Ciudad",     color:"#4E93AB", icon:"🏙️", icons:["🏙️","🏛️","🚦"]},
+  {id:"nutricion", name:"Nutrición",  color:"#E08A1F", icon:"🍎", icons:["🍎","🥗","🍲"]},
+  {id:"educacion", name:"Educación",  color:"#3C6CE0", icon:"🎓", icons:["🎓","📚","🏫"]},
+  {id:"salud",     name:"Salud",      color:"#D7365E", icon:"🩺", icons:["🩺","💊","🏥"]},
+  {id:"juventud",  name:"Juventud",   color:"#8B44D8", icon:"🎸", icons:["🎸","🛹","⚽"]},
+  {id:"obras",     name:"Obras",      color:"#6A6F8C", icon:"🚧", icons:["🚧","🏗️","🔧"]},
+  {id:"otro",      name:"Otro",       color:"#5A6B72", icon:"📍", icons:["📍","⭐","💬"]}
 ];
 const TH = Object.fromEntries(THEMES.map(t=>[t.id,t]));
 const BBOX = {n:-31.55, s:-31.73, w:-60.78, e:-60.58};
@@ -522,7 +521,6 @@ async function postToAPI(payload){
   try{
     const res = await fetch(CONFIG.API, {
       method:"POST",
-      // text/plain evita el preflight OPTIONS que Apps Script no maneja
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify(payload),
       signal: ctrl.signal,
@@ -553,13 +551,12 @@ async function flushQueue(){
 
 /* ---------------- init y sync con Apps Script ---------------- */
 async function initStore(){
-  // 1) pintamos local primero (para que no se vea vacío)
+  // 1) pintamos local primero
   points = local.read();
   refresh();
 
   if(!HAS_API()){
     setStatus(false, "Modo local (sin API)");
-    if(!points.length && !localStorage.getItem("puntos_encuentro")) seed();
     return;
   }
 
@@ -567,7 +564,7 @@ async function initStore(){
   setStatus(false, "Sincronizando…");
   await refreshFromAPI();
 
-  // 3) intentamos vaciar la cola de pendientes
+  // 3) vaciamos la cola de pendientes
   flushQueue();
 }
 
@@ -577,7 +574,6 @@ async function refreshFromAPI(){
     const res = await fetch(CONFIG.API + "?action=list", {method:"GET", redirect:"follow"});
     const j = await res.json();
     if(j && j.ok && Array.isArray(j.points)){
-      // merge: puntos remotos + los locales que todavía no llegaron al server
       const remoteIds = new Set(j.points.map(p=>p.id));
       const localOnly = points.filter(p=>p._local && !remoteIds.has(p.id));
       points = [...localOnly, ...j.points].sort((a,b)=>b.createdAt-a.createdAt);
@@ -739,9 +735,7 @@ function renderFeed(){
   const feed = document.getElementById("feed");
   const list = [...points].sort((a,b)=>b.createdAt-a.createdAt).slice(0,8);
   if(!list.length){
-    feed.innerHTML = `<div class="empty">Todavía no hay puntos. El primero puede ser el tuyo: tocá cualquier lugar del mapa.
-      <br><button id="seed">Cargar 5 puntos de ejemplo</button></div>`;
-    document.getElementById("seed").onclick = seed;
+    feed.innerHTML = `<div class="empty">Todavía no hay puntos cargados. Tocá cualquier lugar del mapa para publicar el primero.</div>`;
     return;
   }
   feed.innerHTML = list.map(p=>{
@@ -792,7 +786,10 @@ function renderStats(){
 function refresh(){ renderMarkers(); renderFeed(); renderTable(); renderStats(); }
 
 /* ---------------- alta ---------------- */
-let pending=null, fTheme="infra", fIcon="🚧", fColor=TH.infra.color;
+let pending=null;
+let fTheme = THEMES[0].id;
+let fIcon  = THEMES[0].icon;
+let fColor = THEMES[0].color;
 const scrim=document.getElementById("scrim"), form=document.getElementById("form");
 
 function openForm(geo){
@@ -853,19 +850,6 @@ document.getElementById("send").onclick = async ()=>{
   confetti(innerWidth/2, innerHeight*0.65);
   toast("🎉 ¡Punto publicado! Gracias por el aporte.");
 };
-
-function seed(){
-  const demo = [
-    {lat:-31.6392,lng:-60.7043,theme:"movilidad",icon:"🚲",color:TH.movilidad.color,text:"La bicisenda se corta justo acá y hay que bajar a la calle con autos.",author:"Lucila",supports:4},
-    {lat:-31.6246,lng:-60.7008,theme:"infra",icon:"💡",color:"#6A6F8C",text:"Cuatro luminarias apagadas hace meses en toda la cuadra.",author:"",supports:2},
-    {lat:-31.6318,lng:-60.7124,theme:"salud",icon:"🦷",color:TH.salud.color,text:"El centro de salud no tiene turnos de odontología para chicos.",author:"Fernanda",supports:6},
-    {lat:-31.6512,lng:-60.7061,theme:"verdes",icon:"🛝",color:TH.verdes.color,text:"Los juegos de la plaza están rotos y el pasto no se corta.",author:"",supports:3},
-    {lat:-31.6152,lng:-60.7086,theme:"alimentacion",icon:"🛒",color:TH.alimentacion.color,text:"No hay verdulería a menos de quince cuadras del barrio.",author:"Vecina de Guadalupe",supports:1}
-  ];
-  const t0 = Date.now();
-  demo.forEach((d,i)=>savePoint({...d, createdAt: t0 - (i+1)*3600000}));
-  toast("🎁 Cargamos cinco ejemplos para que veas el mapa con datos.");
-}
 
 /* ---------------- exportar ---------------- */
 function csv(){
