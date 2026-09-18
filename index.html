@@ -471,9 +471,9 @@ const map = L.map("lmap", {
   zoomControl:false, attributionControl:true,
   maxBounds:[[BBOX.s-0.06, BBOX.w-0.08],[BBOX.n+0.06, BBOX.e+0.08]], maxBoundsViscosity:.7
 });
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-  maxZoom: 20,
-  attribution: '&copy; OpenStreetMap &copy; CARTO',
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   referrerPolicy: 'strict-origin-when-cross-origin'
 }).addTo(map);
 
