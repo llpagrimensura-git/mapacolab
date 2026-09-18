@@ -108,15 +108,10 @@ main{flex:1;position:relative;overflow:hidden}
   position:absolute;top:-6px;right:-6px;background:var(--ink);color:var(--paper);
   font-size:11px;font-weight:700;border-radius:999px;padding:1px 6px;border:2px solid var(--card);
 }
-.mk.is-new .bub{box-shadow:0 0 0 0 rgba(194,65,122,.55);animation:newPing 1.6s ease-out 2}
-@keyframes newPing{
-  0%{box-shadow:0 0 0 0 rgba(194,65,122,.55)}
-  100%{box-shadow:0 0 0 18px rgba(194,65,122,0)}
-}
 .pending{position:absolute;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;
   border:3px dashed var(--hot);animation:pulse 1.4s infinite}
 @keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.22);opacity:.55}}
-@media (prefers-reduced-motion:reduce){.pending,.mk.is-new .bub{animation:none}.mk{transition:none}}
+@media (prefers-reduced-motion:reduce){.pending{animation:none}.mk{transition:none}}
 
 .rail{
   position:absolute;top:10px;left:10px;right:10px;display:flex;gap:7px;overflow-x:auto;
@@ -141,14 +136,16 @@ main{flex:1;position:relative;overflow:hidden}
 .side{
   position:absolute;left:10px;bottom:16px;width:320px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);z-index:11;overflow:hidden;
-  display:flex;flex-direction:column;max-height:min(62dvh,440px);
+  display:flex;flex-direction:column;max-height:min(72dvh,560px);
 }
 .side-head{display:flex;align-items:center;gap:8px;padding:11px 13px 7px;flex:none}
 .side-head h3{font-size:14px;font-weight:700;margin:0}
 .side-head .count-badge{
   background:var(--hot);color:#fff;font-size:11px;font-weight:700;
   border-radius:999px;padding:1px 7px;font-variant-numeric:tabular-nums;
+  transition:transform .2s;
 }
+.side-head .count-badge.pop{transform:scale(1.25)}
 .side-head .refresh{
   margin-left:auto;
   border:1px solid var(--line);background:transparent;border-radius:8px;
@@ -157,18 +154,12 @@ main{flex:1;position:relative;overflow:hidden}
 .side-head .refresh:hover{border-color:var(--ink)}
 .side-head .refresh.spin{animation:spin .8s linear}
 @keyframes spin{to{transform:rotate(360deg)}}
-.feed{flex:1;overflow:auto;padding:0 6px 8px;scroll-behavior:smooth}
+.feed{flex:1;overflow:auto;padding:0 6px 8px;min-height:80px}
 .feed button{
-  display:flex;gap:9px;width:100%;text-align:left;border:0;background:none;padding:8px 7px;border-radius:10px;align-items:flex-start;
-  position:relative;
+  display:flex;gap:9px;width:100%;text-align:left;border:0;background:none;
+  padding:8px 7px;border-radius:10px;align-items:flex-start;
 }
 .feed button:hover{background:var(--land-2)}
-.feed button.fresh-item{background:linear-gradient(90deg, rgba(194,65,122,.10), transparent 70%)}
-.feed button.fresh-item::after{
-  content:"nuevo";position:absolute;top:6px;right:8px;
-  font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;
-  background:var(--hot);color:#fff;border-radius:999px;padding:1px 6px;font-weight:700;
-}
 .feed .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none}
 .feed .ic i{width:9px;height:9px;border-radius:50%;display:block}
 .feed p{margin:0;font-size:13.5px;line-height:1.3}
@@ -228,7 +219,6 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
   background:#25D366;color:#fff;border-color:#1fb356;
 }
 .share-row button.wa:hover{filter:brightness(1.05)}
-.share-row button[hidden]{display:none}
 
 .pop{
   position:absolute;z-index:35;width:262px;background:var(--card);border:1px solid var(--line);
@@ -327,7 +317,6 @@ td.txt{max-width:320px}
   background:var(--c, var(--water));
   animation:growBar .7s cubic-bezier(.34,1.56,.64,1) forwards;
 }
-.bar .fill.no-anim{animation:none;width:var(--w,0%)}
 @keyframes growBar{to{width:var(--w,0%)}}
 .bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
 
@@ -343,8 +332,8 @@ td.txt{max-width:320px}
   .brand span{display:none}
   .tabs{order:3;width:100%;justify-content:space-between}
   .tabs button{flex:1}
-  .side{left:8px;right:8px;width:auto;bottom:8px;max-height:44dvh}
-  .feed{max-height:120px}
+  .side{left:8px;right:8px;width:auto;bottom:8px;max-height:50dvh}
+  .feed{max-height:160px}
   .hint{bottom:auto;top:56px}
   .zoom{bottom:auto;top:56px;right:8px;flex-direction:row}
   .sheet{top:auto;bottom:0;left:0;transform:none;width:100%;border-radius:22px 22px 0 0;max-height:90dvh}
@@ -381,7 +370,6 @@ td.txt{max-width:320px}
   70%{transform:translate(-50%,calc(-100% - 52px)) scale(1.05) rotate(2deg);opacity:1}
   100%{transform:translate(-50%,calc(-100% - 52px)) scale(1) rotate(0);opacity:1}
 }
-@keyframes slideUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes ring{0%{transform:translate(-50%,-50%) scale(.4);opacity:.9}100%{transform:translate(-50%,-50%) scale(3);opacity:0}}
 @keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes squash{0%{transform:scale(1)}40%{transform:scale(.94,.9)}70%{transform:scale(1.05,1.07)}100%{transform:scale(1)}}
@@ -588,7 +576,7 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 "use strict";
 
 /* ═══════════════════════════════════════════════════════════════
-   CONFIGURACIÓN · ACÁ VA TU WEB APP DE APPS SCRIPT
+   CONFIGURACIÓN
    ═══════════════════════════════════════════════════════════════ */
 const CONFIG = {
   API: "https://script.google.com/macros/s/AKfycbx94c2vV116-2GgEloovq0B6WKcSoBgOsrKkyTq0FwtXtjLJ_JIcVoW6fUtxJiBeWAF/exec",
@@ -598,8 +586,8 @@ const CONFIG = {
 
 const HAS_API = () => !!CONFIG.API && /^https?:\/\//.test(CONFIG.API);
 
-/* ═══ DEBUG ═══ */
-const DEBUG = false;
+/* DEBUG: activalo si querés ver en consola qué está pasando con el feed */
+const DEBUG = true;
 function log(...a){ if(DEBUG) console.log("%c[mapa]", "color:#4E93AB;font-weight:bold", ...a); }
 function err(...a){ if(DEBUG) console.error("[mapa]", ...a); }
 
@@ -699,7 +687,8 @@ const local = {
     }catch(e){ return []; }
   },
   write(list){
-    try{ localStorage.setItem("puntos_encuentro", JSON.stringify(list)); }catch(e){}
+    try{ localStorage.setItem("puntos_encuentro", JSON.stringify(list)); }
+    catch(e){ err("no se pudo escribir localStorage:", e); }
   }
 };
 
@@ -707,8 +696,7 @@ const QUEUE_KEY = "puntos_encuentro_queue";
 const queue = {
   read(){ try{ return JSON.parse(localStorage.getItem(QUEUE_KEY)||"[]"); }catch(e){ return []; } },
   write(list){ try{ localStorage.setItem(QUEUE_KEY, JSON.stringify(list)); }catch(e){} },
-  push(item){ const q=this.read(); q.push(item); this.write(q); },
-  clear(){ this.write([]); }
+  push(item){ const q=this.read(); q.push(item); this.write(q); }
 };
 
 async function postToAPI(payload){
@@ -754,6 +742,7 @@ async function flushQueue(){
 /* ══════════════════ INIT ══════════════════ */
 async function initStore(){
   points = local.read();
+  log("initStore: leídos", points.length, "puntos de localStorage");
   refresh();
 
   if(!HAS_API()){
@@ -777,21 +766,23 @@ async function refreshFromAPI(){
       const remote = j.points.map(normalizePoint).filter(Boolean);
       const remoteIds = new Set(remote.map(p=>p.id));
 
-      // ── Preservamos el createdAt local para los puntos que ya conocíamos ──
-      // Esto evita que un cambio de formato de fecha en la planilla reordene
-      // todo y haga "saltar" puntos al tope del feed.
+      // Guardamos los timestamps locales para no perder el orden
       const localTs = new Map(points.map(p => [p.id, p.createdAt]));
+
+      // Los que vinieron de la API: si ya los conocíamos, conservamos su ts local
       const mergedRemote = remote.map(r => {
         const ts = localTs.get(r.id);
         return ts ? {...r, createdAt: ts} : r;
       });
 
-      // Los locales que todavía no aparecen en la planilla se conservan.
+      // Los locales que la API todavía no devolvió (siguen en cola de propagación)
       const localOnly = points
         .filter(p => p._local && !remoteIds.has(p.id))
         .map(p => ({...p}));
 
-      points = [...localOnly, ...mergedRemote].sort((a,b)=>b.createdAt-a.createdAt);
+      if(localOnly.length) log("preservando", localOnly.length, "puntos locales todavía no propagados");
+
+      points = [...localOnly, ...mergedRemote];
       local.write(points);
       setStatus(true, "Conectado · planilla");
       refresh();
@@ -807,7 +798,9 @@ async function refreshFromAPI(){
 async function savePoint(p){
   const newLocal = normalizePoint({id:uid(), ...p, _local:true});
   points = [newLocal, ...points];
-  local.write(points); refresh();
+  local.write(points);
+  refresh();
+  log("savePoint: punto agregado al inicio, total =", points.length);
 
   if(!HAS_API()) return true;
 
@@ -823,8 +816,7 @@ async function savePoint(p){
     const j = await postToAPI(payload);
     if(j && j.ok && j.id){
       newLocal.id = String(j.id);
-      // ⚠ NO borrar _local: la planilla tarda en propagar.
-      // Se limpia solo cuando el punto aparece en la lista remota.
+      // NO borrar _local: la planilla tarda en propagar.
       local.write(points); refresh();
     }else{
       log("add rechazado, encolando:", j);
@@ -845,18 +837,14 @@ async function bumpSupport(p){
   openPop(p);
 
   if(!HAS_API()){
-    log("apoyo: sin API, solo local");
     toast("❤️ Apoyo guardado localmente");
     return;
   }
-
   if(p._local){
-    log("apoyo: punto local, encolado hasta sincronizar", p.id);
     queue.push({action:"support", id:p.id});
     toast("❤️ Apoyo guardado. Se sincroniza al conectar.");
     return;
   }
-
   try{
     const j = await postToAPI({action:"support", id:p.id});
     if(j && j.ok){
@@ -864,7 +852,6 @@ async function bumpSupport(p){
       local.write(points); refresh(); openPop(p);
       toast(`❤️ Apoyo registrado (${p.supports})`);
     }else{
-      log("apoyo rechazado por el server:", j);
       queue.push({action:"support", id:p.id});
       toast("❤️ Apoyo en cola. Se reintenta solo.");
     }
@@ -972,69 +959,91 @@ function flyTo(p){
 }
 
 /* ─────────── FEED (últimos aportes) ───────────
-   · Orden: SIEMPRE más nuevos arriba (sort por createdAt desc).
-   · Los puntos locales que todavía no volvieron de la planilla
-     también cuentan (quedan marcados con _local y tienen prioridad
-     por tener createdAt más reciente).
-   · Se hace scroll al tope cuando aparece un ID nuevo.
-   · Se marca con "nuevo" los que se publicaron en los últimos 60s.
+   Reglas:
+   1. Los puntos que el usuario acaba de crear (_local) SIEMPRE arriba.
+   2. Dentro de cada grupo, más nuevos primero (createdAt DESC).
+   3. Protegido contra createdAt inválidos (NaN, strings rotos, etc).
 */
-const FEED_MAX = 8;
-let lastFeedTopId = null;
+const FEED_MAX = 10;
 
 function renderFeed(){
-  const feed = document.getElementById("feed");
-  const badge = document.getElementById("feedCount");
-  if(badge) badge.textContent = String(points.length);
+  try {
+    const feed = document.getElementById("feed");
+    const badge = document.getElementById("feedCount");
+    if(!feed) return;
 
-  // orden defensivo: más nuevos primero
-  const list = [...points]
-    .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0))
-    .slice(0, FEED_MAX);
+    const prevCount = Number(badge?.dataset.count || 0);
+    if(badge){
+      badge.textContent = String(points.length);
+      badge.dataset.count = String(points.length);
+      if(points.length !== prevCount){
+        badge.classList.remove("pop");
+        void badge.offsetWidth;
+        badge.classList.add("pop");
+        setTimeout(()=>badge.classList.remove("pop"), 250);
+      }
+    }
 
-  if(!list.length){
-    feed.innerHTML = `<div class="empty">Todavía no hay puntos cargados. Tocá cualquier lugar del mapa para publicar el primero.</div>`;
-    lastFeedTopId = null;
-    return;
+    if(!points.length){
+      feed.innerHTML = `<div class="empty">Todavía no hay puntos cargados. Tocá cualquier lugar del mapa para publicar el primero.</div>`;
+      return;
+    }
+
+    const list = [...points]
+      .sort((a,b) => {
+        // 1) _local primero (aunque tengan ts distintos)
+        const la = a._local ? 1 : 0;
+        const lb = b._local ? 1 : 0;
+        if (lb !== la) return lb - la;
+        // 2) createdAt descendente, defendido contra NaN
+        const ta = Number.isFinite(Number(a.createdAt)) ? Number(a.createdAt) : 0;
+        const tb = Number.isFinite(Number(b.createdAt)) ? Number(b.createdAt) : 0;
+        return tb - ta;
+      })
+      .slice(0, FEED_MAX);
+
+    if (DEBUG) {
+      log("renderFeed:", list.length, "items. local=", list.filter(p=>p._local).length,
+          "ids=", list.map(p=>({id:p.id.slice(-6), local:!!p._local, ts:p.createdAt, t:(p.text||"").slice(0,24)})));
+    }
+
+    feed.innerHTML = list.map(p=>{
+      const t = TH[p.theme]||TH.otro;
+      const rawText = String(p.text || "");
+      const snippet = rawText.length>74 ? rawText.slice(0,74)+"…" : rawText;
+      return `<button data-id="${esc(p.id)}" type="button">
+        <span class="ic" style="background:${p.color}1f"><i style="background:${p.color}"></i></span>
+        <span style="min-width:0;flex:1">
+          <p>${esc(snippet)}</p>
+          <small>${t.name} · ${esc(p.author||"Anónimo")} · ${ago(p.createdAt)}</small>
+        </span></button>`;
+    }).join("");
+
+    feed.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      const p = points.find(q=>q.id===b.dataset.id);
+      if(p){ active.add(p.theme); document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",active.has(c.dataset.t))); flyTo(p); }
+    });
+
+    // Siempre arriba para que se vea el último
+    feed.scrollTop = 0;
+  } catch(e){
+    err("renderFeed error:", e);
   }
-
-  const now = Date.now();
-  const topId = list[0].id;
-  const isNewTop = lastFeedTopId !== null && topId !== lastFeedTopId;
-
-  feed.innerHTML = list.map(p=>{
-    const t = TH[p.theme]||TH.otro;
-    const snippet = p.text.length>74 ? p.text.slice(0,74)+"…" : p.text;
-    const isFresh = (now - p.createdAt) < 60000;   // último minuto
-    return `<button data-id="${p.id}" type="button" class="${isFresh?"fresh-item":""}">
-      <span class="ic" style="background:${p.color}1f"><i style="background:${p.color}"></i></span>
-      <span style="min-width:0;flex:1">
-        <p>${esc(snippet)}</p>
-        <small>${t.name} · ${esc(p.author||"Anónimo")} · ${ago(p.createdAt)}</small>
-      </span></button>`;
-  }).join("");
-
-  feed.querySelectorAll("button").forEach(b=>b.onclick=()=>{
-    const p = points.find(q=>q.id===b.dataset.id);
-    if(p){ active.add(p.theme); document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",active.has(c.dataset.t))); flyTo(p); }
-  });
-
-  // Si apareció un punto nuevo arriba, subimos el scroll para que se vea.
-  if(isNewTop) feed.scrollTop = 0;
-  lastFeedTopId = topId;
 }
 
 function renderTable(){
   const box = document.getElementById("tableBox");
   if(!box) return;
   if(!points.length){ box.innerHTML = `<p class="lead">Sin datos todavía.</p>`; return; }
-  const rows = [...points].sort((a,b)=>b.createdAt-a.createdAt).map(p=>`<tr>
-    <td>${new Date(p.createdAt).toLocaleString("es-AR")}</td>
-    <td>${(TH[p.theme]||TH.otro).name}</td>
-    <td class="txt">${esc(p.text)}</td>
-    <td>${esc(p.author||"Anónimo")}</td>
-    <td>${p.lat.toFixed(5)}</td><td>${p.lng.toFixed(5)}</td>
-    <td>${p.supports||0}</td></tr>`).join("");
+  const rows = [...points]
+    .sort((a,b)=> (Number(b.createdAt)||0) - (Number(a.createdAt)||0))
+    .map(p=>`<tr>
+      <td>${new Date(p.createdAt).toLocaleString("es-AR")}</td>
+      <td>${(TH[p.theme]||TH.otro).name}</td>
+      <td class="txt">${esc(p.text)}</td>
+      <td>${esc(p.author||"Anónimo")}</td>
+      <td>${p.lat.toFixed(5)}</td><td>${p.lng.toFixed(5)}</td>
+      <td>${p.supports||0}</td></tr>`).join("");
   box.innerHTML = `<table><thead><tr>
     <th>Fecha</th><th>Temática</th><th>Aporte</th><th>Quién</th><th>Lat</th><th>Lng</th><th>Apoyos</th>
     </tr></thead><tbody>${rows}</tbody></table>`;
@@ -1233,14 +1242,9 @@ function renderStats(){
   if(elTop) elTop.textContent = total ? top.t.name : "—";
 
   renderBars(counts, total);
-
   renderCharts();
 }
 
-/* ─────────── RANKING (barras por temática) ───────────
-   Cada barra se pinta con el color del tema y crece
-   desde 0 hasta su valor con una animación.
-*/
 let lastBarsSig = "";
 function renderBars(counts, total){
   const barsBox = document.getElementById("bars");
@@ -1255,7 +1259,7 @@ function renderBars(counts, total){
   }
 
   const sig = counts.map(c => `${c.t.id}:${c.n}`).join("|");
-  if(sig === lastBarsSig) return;   // sin cambios → no re-animamos
+  if(sig === lastBarsSig) return;
   lastBarsSig = sig;
 
   const max = Math.max(1, ...counts.map(c => c.n));
@@ -1345,9 +1349,11 @@ document.getElementById("send").onclick = async ()=>{
 function csv(){
   const head = ["fecha","tematica","texto","autor","lat","lng","apoyos"];
   const esc2 = v => `"${String(v).replace(/"/g,'""')}"`;
-  const rows = [...points].sort((a,b)=>b.createdAt-a.createdAt).map(p=>[
-    new Date(p.createdAt).toISOString(), (TH[p.theme]||TH.otro).name, p.text,
-    p.author||"Anónimo", p.lat, p.lng, p.supports||0].map(esc2).join(","));
+  const rows = [...points]
+    .sort((a,b)=> (Number(b.createdAt)||0) - (Number(a.createdAt)||0))
+    .map(p=>[
+      new Date(p.createdAt).toISOString(), (TH[p.theme]||TH.otro).name, p.text,
+      p.author||"Anónimo", p.lat, p.lng, p.supports||0].map(esc2).join(","));
   return [head.join(","), ...rows].join("\n");
 }
 document.getElementById("csvBtn").onclick = ()=>{
@@ -1403,10 +1409,11 @@ document.getElementById("copyLink").onclick = async ()=>{
 
 document.getElementById("shareRow").addEventListener("click", e=>{
   const b = e.target.closest("button[data-s]"); if(!b) return;
-  const s = b.dataset.s;
-  const u = encodeURIComponent(SHARE_URL);
-  const t = encodeURIComponent(SHARE_TEXT);
-  if(s==="wa")   window.open(`https://wa.me/?text=${t}%20${u}`, "_blank", "noopener");
+  if(b.dataset.s === "wa"){
+    const u = encodeURIComponent(SHARE_URL);
+    const t = encodeURIComponent(SHARE_TEXT);
+    window.open(`https://wa.me/?text=${t}%20${u}`, "_blank", "noopener");
+  }
 });
 
 /* ══════════════════ TABS + UTILIDADES ══════════════════ */
@@ -1508,6 +1515,13 @@ startPoll();
 addEventListener("online", ()=>{ flushQueue(); refreshFromAPI(); });
 
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>renderCharts());
+
+/* Herramienta de diagnóstico para la consola del navegador */
+window.__mapaDebug = {
+  dump(){ console.table(points.map(p=>({id:p.id.slice(-6), local:p._local, ts:new Date(p.createdAt).toLocaleString("es-AR"), theme:p.theme, text:(p.text||"").slice(0,30)}))); },
+  count(){ return { total: points.length, local: points.filter(p=>p._local).length }; },
+  clearLocal(){ localStorage.removeItem("puntos_encuentro"); localStorage.removeItem("puntos_encuentro_queue"); location.reload(); }
+};
 
 })();
 </script>
