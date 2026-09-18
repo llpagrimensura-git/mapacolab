@@ -144,6 +144,7 @@ main{flex:1;position:relative;overflow:hidden}
 }
 .feed button:hover{background:var(--land-2)}
 .feed .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:14px;flex:none}
+.feed .ic i{width:9px;height:9px;border-radius:50%;display:block}
 .feed p{margin:0;font-size:13.5px;line-height:1.3}
 .feed small{color:var(--ink-soft);font-size:11.5px}
 .empty{padding:6px 13px 14px;color:var(--ink-soft);font-size:13.5px}
@@ -165,7 +166,8 @@ label.f span{font-weight:400;color:var(--ink-soft)}
 .grid-th{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:7px}
 .th{display:flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:transparent;border-radius:11px;padding:8px 9px;font-size:13.5px;text-align:left}
 .th[aria-pressed="true"]{border-color:var(--ink);background:var(--land-2)}
-.th i{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:13px;flex:none}
+.th i{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;flex:none}
+.th i b{width:10px;height:10px;border-radius:50%;display:block}
 .row{display:flex;gap:7px;flex-wrap:wrap}
 .ico{border:1.5px solid var(--line);background:transparent;border-radius:10px;width:42px;height:42px;display:grid;place-items:center;font-size:18px}
 .ico[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--card)}
@@ -184,13 +186,28 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 .cta[disabled]{opacity:.45}
 .note{font-size:12.5px;color:var(--ink-soft);margin-top:10px}
 
+/* ── compartir ── */
+.share-link{display:flex;gap:8px;align-items:stretch;margin:14px 0 4px}
+.share-link input{
+  flex:1;min-width:0;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
+  border-radius:12px;padding:12px;font:inherit;font-size:14px;
+}
+.share-link .cta{width:auto;flex:none;margin:0;padding:0 20px;font-size:15px;border-radius:12px}
+.share-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.share-row button{
+  border:1.5px solid var(--line);background:var(--card);border-radius:12px;
+  padding:12px 10px;font-size:14px;font-weight:500;
+}
+.share-row button:hover{border-color:var(--ink)}
+.share-row button[hidden]{display:none}
+
 .pop{
   position:absolute;z-index:35;width:262px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);padding:13px;display:none;pointer-events:auto;
   transform:translate(-50%,calc(-100% - 52px));
 }
 .pop.on{display:block}
-.pop .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px 3px 6px;color:#fff}
+.pop .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
 .pop p{margin:9px 0 6px;font-size:14.5px;line-height:1.35}
 .pop .meta{font-size:12px;color:var(--ink-soft)}
 .pop .acts{display:flex;gap:7px;margin-top:11px}
@@ -211,15 +228,18 @@ td.txt{max-width:320px}
 
 /* ═══════════════ ESTADÍSTICAS ═══════════════ */
 .counter-hero{
-  background:linear-gradient(135deg,#14323F,#2a5a70);
-  color:#E7EFEC;border-radius:20px;padding:26px 22px 20px;
-  margin-bottom:20px;box-shadow:var(--shadow);
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;padding:26px 22px 20px;
+  margin-bottom:20px;
   position:relative;overflow:hidden;
+  box-shadow:0 2px 10px rgba(20,50,63,.06);
 }
 .counter-hero::after{
-  content:"";position:absolute;inset:0;
-  background:radial-gradient(circle at 85% 20%, rgba(244,185,62,.22), transparent 55%);
-  pointer-events:none;
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 88% 6%, rgba(244,185,62,.20), transparent 55%),
+    radial-gradient(circle at 4% 96%, rgba(78,147,171,.16), transparent 52%);
 }
 .counter-main{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -229,30 +249,28 @@ td.txt{max-width:320px}
   font-family:"Bricolage Grotesque",Karla,sans-serif;
   font-size:clamp(56px,10vw,88px);
   line-height:1;letter-spacing:-.04em;
-  background:linear-gradient(180deg,#FFFFFF,#BFD3A6);
+  background:linear-gradient(180deg,var(--ink),#4E93AB);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));
   font-variant-numeric:tabular-nums;
 }
 .counter-main span{
   font-size:14px;letter-spacing:.08em;text-transform:uppercase;
-  color:#9DB2B8;margin-top:6px;font-weight:500;
+  color:var(--ink-soft);margin-top:6px;font-weight:500;
 }
 .counter-row{
   display:grid;grid-template-columns:repeat(3,1fr);
   gap:10px;margin-top:20px;position:relative;z-index:1;
 }
 .counter-cell{
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  background:var(--land-2);border:1px solid var(--line);
   border-radius:14px;padding:12px 10px;text-align:center;
-  backdrop-filter:blur(6px);
 }
 .counter-cell b{
   display:block;font-family:"Bricolage Grotesque",Karla,sans-serif;
-  font-size:26px;line-height:1.1;color:#FFFFFF;font-variant-numeric:tabular-nums;
+  font-size:26px;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums;
 }
 .counter-cell span{
-  font-size:11.5px;color:#9DB2B8;letter-spacing:.04em;
+  font-size:11.5px;color:var(--ink-soft);letter-spacing:.04em;
   text-transform:uppercase;font-weight:500;
 }
 
@@ -278,8 +296,6 @@ td.txt{max-width:320px}
 .bar .fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
 .bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
 
-.qr{display:grid;grid-template-columns:repeat(21,1fr);width:172px;height:172px;margin:6px auto 10px;background:#fff;padding:8px;border-radius:10px}
-.qr i{background:#0d1f26}
 .toast{
   position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:var(--paper);
   padding:11px 17px;border-radius:12px;font-size:14px;z-index:90;box-shadow:var(--shadow);display:none;max-width:88vw;text-align:center;
@@ -305,6 +321,7 @@ td.txt{max-width:320px}
   .chart-card.wide{grid-column:auto}
   .counter-row{grid-template-columns:1fr 1fr;gap:8px}
   .counter-cell:last-child{grid-column:1 / -1}
+  .share-row{grid-template-columns:1fr}
 }
 
 @keyframes dropIn{
@@ -411,7 +428,7 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     </div>
     <div class="spacer"></div>
     <div class="status" id="status"><i class="dot"></i><span>Cargando</span></div>
-    <button class="ghost" id="qrBtn">🎉 Compartir</button>
+    <button class="ghost" id="qrBtn">Compartir</button>
   </header>
 
   <main>
@@ -503,7 +520,7 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     <label class="f">Temática</label>
     <div class="grid-th" id="themes"></div>
 
-    <label class="f">Ícono</label>
+    <label class="f">Ícono <span>· opcional</span></label>
     <div class="row" id="icons"></div>
 
     <label class="f" for="txt">Qué querés contar <span>· hasta 280 caracteres</span></label>
@@ -519,14 +536,27 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
   </div>
 </div>
 
-<div class="sheet" id="qr" role="dialog" aria-modal="true" aria-label="Compartir">
+<div class="sheet" id="qr" role="dialog" aria-modal="true" aria-label="Compartir el mapa">
   <div class="sheet-head">
     <h2>Sumá a más gente</h2>
     <button class="x" id="qrX" aria-label="Cerrar">✕</button>
   </div>
   <div class="sheet-body">
-    <div class="qr" id="qrGrid" aria-hidden="true"></div>
-    <p class="note" style="text-align:center">Código de muestra. En producción lleva a la URL del mapa: se imprime en volantes, se proyecta en pantalla y se deja en las tablets #Encuentro.</p>
+    <p class="note" style="margin-top:0">Copiá el link y pegalo en el grupo de WhatsApp, en el mail o donde te sirva. Se abre en cualquier celular, sin instalar nada.</p>
+
+    <div class="share-link">
+      <input type="text" id="shareUrl" readonly spellcheck="false" aria-label="Link del mapa">
+      <button class="cta" id="copyLink">Copiar</button>
+    </div>
+
+    <div class="share-row" id="shareRow">
+      <button data-s="wa">WhatsApp</button>
+      <button data-s="tg">Telegram</button>
+      <button data-s="mail">Email</button>
+      <button data-s="native" id="nativeShare" hidden>Más opciones…</button>
+    </div>
+
+    <p class="note">También podés proyectarlo en pantalla durante el Encuentro y que la gente escanee… o simplemente escribir la dirección a mano. 😉</p>
   </div>
 </div>
 
@@ -551,17 +581,21 @@ const DEBUG = true;
 function log(...a){ if(DEBUG) console.log("%c[mapa]", "color:#4E93AB;font-weight:bold", ...a); }
 function err(...a){ console.error("[mapa]", ...a); }
 
-/* ---------------- temáticas e íconos ---------------- */
+/* ---------------- temáticas (sin íconos) ---------------- */
 const THEMES = [
-  {id:"ciudad",    name:"Ciudad",     color:"#4E93AB", icon:"🏙️", icons:["🏙️","🏛️","🚦"]},
-  {id:"nutricion", name:"Nutrición",  color:"#E08A1F", icon:"🍎", icons:["🍎","🥗","🍲"]},
-  {id:"educacion", name:"Educación",  color:"#3C6CE0", icon:"🎓", icons:["🎓","📚","🏫"]},
-  {id:"salud",     name:"Salud",      color:"#D7365E", icon:"🩺", icons:["🩺","💊","🏥"]},
-  {id:"juventud",  name:"Juventud",   color:"#8B44D8", icon:"🎸", icons:["🎸","🛹","⚽"]},
-  {id:"obras",     name:"Obras",      color:"#6A6F8C", icon:"🚧", icons:["🚧","🏗️","🔧"]},
-  {id:"otro",      name:"Otro",       color:"#5A6B72", icon:"📍", icons:["📍","⭐","💬"]}
+  {id:"ciudad",    name:"Ciudad",     color:"#4E93AB"},
+  {id:"nutricion", name:"Nutrición",  color:"#E08A1F"},
+  {id:"educacion", name:"Educación",  color:"#3C6CE0"},
+  {id:"salud",     name:"Salud",      color:"#D7365E"},
+  {id:"juventud",  name:"Juventud",   color:"#8B44D8"},
+  {id:"obras",     name:"Obras",      color:"#6A6F8C"},
+  {id:"otro",      name:"Otro",       color:"#5A6B72"}
 ];
 const TH = Object.fromEntries(THEMES.map(t=>[t.id,t]));
+
+/* ---------------- íconos de los puntos (lista única) ---------------- */
+const ICONS = ["📍","⭐","💬","🏙️","🚦","🌳","🍎","🎓","🩺","🎸","🚧","🚲"];
+
 const BBOX = {n:-31.55, s:-31.73, w:-60.78, e:-60.58};
 const BAD = ["puto","idiota","imbecil","imbécil","pelotudo","forro"];
 const LIMIT = 6, WINDOW_MS = 10*60*1000;
@@ -807,7 +841,7 @@ function renderMarkers(){
       rendered.add(p.id);
     }
 
-    b.innerHTML = `<div class="bub" style="background:${p.color}"><em>${p.icon}</em></div>`+
+    b.innerHTML = `<div class="bub" style="background:${p.color}"><em>${p.icon||"📍"}</em></div>`+
       (p.supports? `<span class="sup">+${p.supports}</span>`:"");
     b.onclick = ev => { ev.stopPropagation(); openPop(p); };
     overlay.appendChild(b);
@@ -837,7 +871,7 @@ function openPop(p){
   const t = TH[p.theme]||TH.otro;
   pop.innerHTML = `
     <button class="close" aria-label="Cerrar">✕</button>
-    <span class="tag" style="background:${p.color}">${p.icon} ${t.name}</span>
+    <span class="tag" style="background:${p.color}">${t.name}</span>
     <p>${esc(p.text)}</p>
     <div class="meta">${esc(p.author||"Anónimo")} · ${ago(p.createdAt)}</div>
     <div class="acts">
@@ -874,7 +908,7 @@ function renderFeed(){
   feed.innerHTML = list.map(p=>{
     const t = TH[p.theme]||TH.otro;
     return `<button data-id="${p.id}">
-      <span class="ic" style="background:${p.color}22;color:${p.color}">${p.icon}</span>
+      <span class="ic" style="background:${p.color}1f"><i style="background:${p.color}"></i></span>
       <span><p>${esc(p.text.slice(0,74))}${p.text.length>74?"…":""}</p>
       <small>${t.name} · ${esc(p.author||"Anónimo")} · ${ago(p.createdAt)}</small></span></button>`;
   }).join("");
@@ -997,7 +1031,6 @@ function renderCharts(){
   // ── Línea de aportes por día ──
   const timelineCanvas = document.getElementById("chartTimeline");
   if(timelineCanvas){
-    // agrupamos por día
     const byDay = {};
     points.forEach(p => {
       const d = new Date(p.createdAt);
@@ -1005,7 +1038,6 @@ function renderCharts(){
       byDay[key] = (byDay[key]||0) + 1;
     });
     const days = Object.keys(byDay).sort();
-    // Si hay un solo día, mostramos las últimas 24h
     let labels = [], values = [];
     if(days.length <= 1){
       const now = new Date();
@@ -1079,7 +1111,6 @@ function renderCharts(){
 
 /* ══════════════════ ESTADÍSTICAS ══════════════════ */
 function renderStats(){
-  const statsBox = document.getElementById("stats"); // por compatibilidad, no se usa ahora
   const barsBox  = document.getElementById("bars");
   const elTotal  = document.getElementById("countTotal");
   const elSup    = document.getElementById("countSup");
@@ -1095,13 +1126,11 @@ function renderStats(){
   })).sort((a,b) => b.n - a.n);
   const top = counts[0];
 
-  // contadores animados
   animateNumber(elTotal,  total);
   animateNumber(elSup,    sup);
   animateNumber(elPeople, autores.size);
   if(elTop) elTop.textContent = total ? top.t.name : "—";
 
-  // ranking (barras horizontales, las de siempre)
   if(barsBox){
     if(total === 0){
       barsBox.innerHTML = `<h3>Ranking</h3><p class="lead" style="margin:0">Todavía no hay datos. Cuando se carguen puntos, acá vas a ver el ranking por temática.</p>`;
@@ -1124,7 +1153,7 @@ function refresh(){ renderMarkers(); renderFeed(); renderTable(); renderStats();
 /* ---------------- alta ---------------- */
 let pending=null;
 let fTheme = THEMES[0].id;
-let fIcon  = THEMES[0].icon;
+let fIcon  = ICONS[0];
 let fColor = THEMES[0].color;
 const scrim=document.getElementById("scrim"), form=document.getElementById("form");
 
@@ -1145,14 +1174,14 @@ scrim.onclick = ()=>{ closeForm(); closeQR(); };
 function paintThemes(){
   document.getElementById("themes").innerHTML = THEMES.map(t=>
     `<button class="th" data-t="${t.id}" aria-pressed="${t.id===fTheme}">
-      <i style="background:${t.color}22;color:${t.color}">${t.icon}</i>${t.name}</button>`).join("");
+      <i style="background:${t.color}1f"><b style="background:${t.color}"></b></i>${t.name}</button>`).join("");
   document.querySelectorAll("#themes .th").forEach(b=>b.onclick=()=>{
-    fTheme=b.dataset.t; fIcon=TH[fTheme].icon; fColor=TH[fTheme].color;
-    paintThemes(); paintIcons();
+    fTheme=b.dataset.t; fColor=TH[fTheme].color;
+    paintThemes();
   });
 }
 function paintIcons(){
-  document.getElementById("icons").innerHTML = TH[fTheme].icons.map(i=>
+  document.getElementById("icons").innerHTML = ICONS.map(i=>
     `<button class="ico" data-i="${i}" aria-pressed="${i===fIcon}">${i}</button>`).join("");
   document.querySelectorAll("#icons .ico").forEach(b=>b.onclick=()=>{ fIcon=b.dataset.i; paintIcons(); });
 }
@@ -1213,25 +1242,62 @@ document.getElementById("copyBtn").onclick = async ()=>{
   catch(e){ toast("🔒 El navegador bloqueó el portapapeles."); }
 };
 
-/* ---------------- QR + tabs + utilidades ---------------- */
+/* ---------------- COMPARTIR ---------------- */
+const SHARE_URL = /^https?:/.test(location.protocol)
+  ? location.origin + location.pathname
+  : "https://mapacolab.netlify.app/";
+const SHARE_TITLE = "Mapa #Encuentro · Santa Fe";
+const SHARE_TEXT  = "Mirá el Mapa #Encuentro de Santa Fe y sumá tu punto:";
+
 const qr = document.getElementById("qr");
 function closeQR(){ qr.classList.remove("on"); scrim.classList.remove("on"); }
 document.getElementById("qrX").onclick = closeQR;
+
 document.getElementById("qrBtn").onclick = ()=>{
-  const g = document.getElementById("qrGrid");
-  if(!g.children.length){
-    let h="";
-    for(let r=0;r<21;r++) for(let c=0;c<21;c++){
-      const finder = (r<7&&c<7)||(r<7&&c>13)||(r>13&&c<7);
-      const ring = finder && (r%7===0||c%7===0||r%7===6||c%7===6||(r%7>1&&r%7<5&&c%7>1&&c%7<5));
-      const on = finder ? ring : ((r*7+c*13+((r*c)%5))%3===0);
-      h += `<i style="${on?"":"background:transparent"}"></i>`;
-    }
-    g.innerHTML=h;
-  }
+  const inp = document.getElementById("shareUrl");
+  if(inp) inp.value = SHARE_URL;
   qr.classList.add("on"); scrim.classList.add("on");
+  setTimeout(()=>{ const i=document.getElementById("shareUrl"); if(i) i.select(); }, 120);
 };
 
+document.getElementById("copyLink").onclick = async ()=>{
+  const inp = document.getElementById("shareUrl");
+  try{
+    await navigator.clipboard.writeText(SHARE_URL);
+    toast("🔗 Link copiado. Pegalo donde quieras.");
+  }catch(e){
+    try{
+      inp.removeAttribute("readonly");
+      inp.select(); inp.setSelectionRange(0, 999);
+      document.execCommand("copy");
+      inp.setAttribute("readonly","readonly");
+      inp.blur();
+      toast("🔗 Link copiado.");
+    }catch(e2){ toast("Copiá el link a mano 🙏"); }
+  }
+};
+
+document.getElementById("shareRow").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-s]"); if(!b) return;
+  const s = b.dataset.s;
+  const u = encodeURIComponent(SHARE_URL);
+  const t = encodeURIComponent(SHARE_TEXT);
+  if(s==="wa")   window.open(`https://wa.me/?text=${t}%20${u}`, "_blank", "noopener");
+  if(s==="tg")   window.open(`https://t.me/share/url?url=${u}&text=${t}`, "_blank", "noopener");
+  if(s==="mail") location.href = `mailto:?subject=${encodeURIComponent(SHARE_TITLE)}&body=${t}%20${u}`;
+});
+
+const nativeBtn = document.getElementById("nativeShare");
+if(navigator.share){
+  nativeBtn.hidden = false;
+  nativeBtn.onclick = ()=>{
+    navigator.share({ title: SHARE_TITLE, text: SHARE_TEXT, url: SHARE_URL }).catch(()=>{});
+  };
+}else{
+  nativeBtn.hidden = true;
+}
+
+/* ---------------- tabs + utilidades ---------------- */
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected", x===b));
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id==="v-"+b.dataset.tab));
