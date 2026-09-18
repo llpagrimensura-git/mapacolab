@@ -285,24 +285,16 @@ td.txt{max-width:320px}
   100%{transform:translate(-50%,0) scale(1);opacity:1}
 }
 
-/* Marcadores: caída + wobble */
 .mk{animation:none}
 .mk.fresh{animation:dropIn .6s cubic-bezier(.34,1.56,.64,1) both}
 .mk:hover,.mk[data-sel="1"]{animation:wobble .6s ease-in-out infinite;transform:translate(-50%,-100%) scale(1.1);z-index:6}
-
-/* Pending: latido */
 .pending{animation:heartbeat 1.2s ease-in-out infinite}
 
-/* Chips */
 .chip{transition:transform .18s cubic-bezier(.34,1.56,.64,1), opacity .2s, background .2s}
 .chip:hover{transform:translateY(-2px) scale(1.06)}
 .chip:active{animation:squash .3s}
 .chip[aria-pressed="true"]{background:linear-gradient(180deg,var(--card),var(--land-2))}
-
-/* Popup */
 .pop.on{animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
-
-/* Feed con entrada escalonada */
 .feed button{animation:slideUp .4s ease both;transition:transform .15s, background .2s}
 .feed button:nth-child(1){animation-delay:0s}
 .feed button:nth-child(2){animation-delay:.05s}
@@ -314,7 +306,6 @@ td.txt{max-width:320px}
 .feed button:nth-child(8){animation-delay:.35s}
 .feed button:hover{transform:translateX(4px)}
 
-/* Botones con prensa elástica */
 button{transition:transform .12s ease, box-shadow .2s, background .2s, border-color .2s, color .2s}
 .ghost:hover,.zoom button:hover{transform:translateY(-2px)}
 .ghost:active,.cta:active,.zoom button:active,.ico:active,.th:active,.tabs button:active{animation:squash .3s}
@@ -322,19 +313,15 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 .th[aria-pressed="true"],.ico[aria-pressed="true"]{animation:bobIn .3s}
 .tabs button[aria-selected="true"]{transform:translateY(-1px)}
 
-/* CTA con brillo */
 .cta{background:linear-gradient(135deg,#14323F,#2a5a70,#14323F);background-size:220% 100%;position:relative}
 .cta:hover{animation:shine 2.2s linear infinite}
 .cta[disabled]{background:var(--ink-soft);animation:none}
 
-/* Toast saltarín */
 .toast.on{animation:toastIn .45s cubic-bezier(.34,1.56,.64,1) both}
 
-/* Anillo de click */
 .ripple{position:absolute;width:80px;height:80px;border:3px solid var(--hot);border-radius:50%;
   pointer-events:none;animation:ring .75s ease-out forwards;z-index:8;margin-left:-40px;margin-top:-40px}
 
-/* Confeti */
 .confetti{position:fixed;pointer-events:none;z-index:200;will-change:transform}
 
 @media (prefers-reduced-motion: reduce){
@@ -361,7 +348,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
   </header>
 
   <main>
-    <!-- MAPA -->
     <section class="view on" id="v-mapa">
       <div id="mapwrap">
         <div id="lmap" aria-label="Mapa de la ciudad de Santa Fe"></div>
@@ -380,7 +366,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
       </aside>
     </section>
 
-    <!-- PLANILLA -->
     <section class="view" id="v-planilla">
       <div class="pane"><div class="pane-in">
         <h2>Planilla de aportes</h2>
@@ -393,7 +378,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
       </div></div>
     </section>
 
-    <!-- DATOS -->
     <section class="view" id="v-datos">
       <div class="pane"><div class="pane-in">
         <h2>Qué está diciendo la gente</h2>
@@ -407,7 +391,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 
 <div class="scrim" id="scrim"></div>
 
-<!-- Alta de punto -->
 <div class="sheet" id="form" role="dialog" aria-modal="true" aria-label="Agregar un punto">
   <div class="sheet-head">
     <h2>Contá qué pasa acá</h2>
@@ -435,7 +418,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
   </div>
 </div>
 
-<!-- QR -->
 <div class="sheet" id="qr" role="dialog" aria-modal="true" aria-label="Compartir">
   <div class="sheet-head">
     <h2>Sumá a más gente</h2>
@@ -453,6 +435,16 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 (() => {
 "use strict";
 
+/* ═══════════════════════════════════════════════════════════════
+   CONFIGURACIÓN · ACÁ VA TU WEB APP DE APPS SCRIPT
+   ═══════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  "https://script.google.com/macros/s/AKfycbx94c2vV116-2GgEloovq0B6WKcSoBgOsrKkyTq0FwtXtjLJ_JIcVoW6fUtxJiBeWAF/exec"
+  API: "",                // ← dejalo vacío "" para funcionar SOLO en local (localStorage)
+  TIMEOUT: 8000
+};
+const HAS_API = () => !!CONFIG.API && /^https?:\/\//.test(CONFIG.API);
+
 /* ---------------- datos base ---------------- */
 const THEMES = [
   {id:"educacion",  name:"Educación",      color:"#3C6CE0", icon:"🎓", icons:["🎓","📚","🏫","✏️"]},
@@ -464,15 +456,14 @@ const THEMES = [
   {id:"otro",       name:"Otro",           color:"#5A6B72", icon:"📍", icons:["📍","⭐","❗","💬"]}
 ];
 const TH = Object.fromEntries(THEMES.map(t=>[t.id,t]));
-const BBOX = {n:-31.55, s:-31.73, w:-60.78, e:-60.58};   // área de interés: Santa Fe
+const BBOX = {n:-31.55, s:-31.73, w:-60.78, e:-60.58};
 const BAD = ["puto","idiota","imbecil","imbécil","pelotudo","forro"];
 const LIMIT = 6, WINDOW_MS = 10*60*1000;
 
-/* ---------------- mapa OpenStreetMap ---------------- */
+/* ---------------- mapa ---------------- */
 const wrap = document.getElementById("mapwrap");
 const overlay = document.getElementById("overlay");
 
-// Fuerza el envío del Referer para que los tiles no se bloqueen.
 L.TileLayer.prototype.options.referrerPolicy = 'strict-origin-when-cross-origin';
 
 const map = L.map("lmap", {
@@ -492,7 +483,6 @@ function applyVB(){ map.invalidateSize(); positionMarkers(); }
 map.on("move zoom viewreset resize", positionMarkers);
 addEventListener("resize", ()=>applyVB());
 
-/* Click en el mapa: anillo + abrir formulario */
 map.on("click", e => {
   const s = toScreen(e.latlng.lat, e.latlng.lng);
   const r = document.createElement("div");
@@ -516,26 +506,138 @@ const local = {
   write(list){ try{ localStorage.setItem("puntos_encuentro", JSON.stringify(list)); }catch(e){} }
 };
 
+/* ──────────── cola de sincronización para offline ──────────── */
+const QUEUE_KEY = "puntos_encuentro_queue";
+const queue = {
+  read(){ try{ return JSON.parse(localStorage.getItem(QUEUE_KEY)||"[]"); }catch(e){ return []; } },
+  write(list){ try{ localStorage.setItem(QUEUE_KEY, JSON.stringify(list)); }catch(e){} },
+  push(item){ const q=this.read(); q.push(item); this.write(q); },
+  clear(){ this.write([]); }
+};
+
+async function postToAPI(payload){
+  if(!HAS_API()) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), CONFIG.TIMEOUT);
+  try{
+    const res = await fetch(CONFIG.API, {
+      method:"POST",
+      // text/plain evita el preflight OPTIONS que Apps Script no maneja
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal,
+      redirect: "follow"
+    });
+    clearTimeout(timer);
+    return await res.json();
+  }catch(e){
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
+async function flushQueue(){
+  if(!HAS_API()) return;
+  const q = queue.read();
+  if(!q.length) return;
+  const pending = [];
+  for(const item of q){
+    try{
+      const j = await postToAPI(item);
+      if(!j || !j.ok) pending.push(item);
+    }catch(e){ pending.push(item); }
+  }
+  queue.write(pending);
+  if(q.length !== pending.length) refreshFromAPI();
+}
+
+/* ---------------- init y sync con Apps Script ---------------- */
 async function initStore(){
+  // 1) pintamos local primero (para que no se vea vacío)
   points = local.read();
-  setStatus(false,"Guardado en este dispositivo");
   refresh();
-  if(!points.length && !localStorage.getItem("puntos_encuentro")) seed();
+
+  if(!HAS_API()){
+    setStatus(false, "Modo local (sin API)");
+    if(!points.length && !localStorage.getItem("puntos_encuentro")) seed();
+    return;
+  }
+
+  // 2) traemos todo desde la planilla
+  setStatus(false, "Sincronizando…");
+  await refreshFromAPI();
+
+  // 3) intentamos vaciar la cola de pendientes
+  flushQueue();
 }
+
+async function refreshFromAPI(){
+  if(!HAS_API()) return;
+  try{
+    const res = await fetch(CONFIG.API + "?action=list", {method:"GET", redirect:"follow"});
+    const j = await res.json();
+    if(j && j.ok && Array.isArray(j.points)){
+      // merge: puntos remotos + los locales que todavía no llegaron al server
+      const remoteIds = new Set(j.points.map(p=>p.id));
+      const localOnly = points.filter(p=>p._local && !remoteIds.has(p.id));
+      points = [...localOnly, ...j.points].sort((a,b)=>b.createdAt-a.createdAt);
+      local.write(points);
+      setStatus(true, "Conectado · planilla");
+      refresh();
+    }else{
+      setStatus(false, "Modo local");
+    }
+  }catch(e){
+    setStatus(false, "Sin conexión · guardado local");
+  }
+}
+
 async function savePoint(p){
-  points = [{id:uid(), ...p}, ...points];
-  local.write(points); refresh(); return true;
+  const newLocal = {id:uid(), ...p, _local:true};
+  points = [newLocal, ...points];
+  local.write(points); refresh();
+
+  if(!HAS_API()) return true;
+
+  const payload = {
+    action:"add",
+    lat:newLocal.lat, lng:newLocal.lng,
+    theme:newLocal.theme, icon:newLocal.icon, color:newLocal.color,
+    text:newLocal.text, author:newLocal.author,
+    ua: navigator.userAgent
+  };
+
+  try{
+    const j = await postToAPI(payload);
+    if(j && j.ok && j.id){
+      newLocal.id = j.id;
+      delete newLocal._local;
+      local.write(points); refresh();
+    }else{
+      queue.push(payload);
+    }
+  }catch(e){
+    queue.push(payload);
+    toast("📶 Guardado local. Se sincroniza cuando vuelva la red.");
+  }
+  return true;
 }
+
 async function bumpSupport(p){
   p.supports = (p.supports||0)+1;
-  local.write(points);
+  local.write(points); refresh();
   const btn = pop.querySelector('[data-a="sup"]');
-  if(btn){
-    const r = btn.getBoundingClientRect();
-    heartBurst(r.left + r.width/2, r.top + r.height/2);
+  if(btn){ const r = btn.getBoundingClientRect(); heartBurst(r.left + r.width/2, r.top + r.height/2); }
+  openPop(p);
+
+  if(!HAS_API() || p._local) {
+    if(p._local) queue.push({action:"support", id:p.id});
+    return;
   }
-  refresh(); openPop(p);
+  try{ await postToAPI({action:"support", id:p.id}); }
+  catch(e){ queue.push({action:"support", id:p.id}); }
 }
+
 function setStatus(live, text){
   const s = document.getElementById("status");
   s.innerHTML = `<i class="dot${live?" live":""}"></i><span>${text}</span>`;
@@ -569,7 +671,6 @@ function renderMarkers(){
     const b = document.createElement("button");
     b.className="mk"; b.dataset.id=p.id;
 
-    // Solo animamos la primera vez que aparece cada punto
     if(!rendered.has(p.id)){
       b.classList.add("fresh");
       b.style.animationDelay = (Math.min(i,12)*0.045)+"s";
@@ -690,7 +791,7 @@ function renderStats(){
 
 function refresh(){ renderMarkers(); renderFeed(); renderTable(); renderStats(); }
 
-/* ---------------- alta de punto ---------------- */
+/* ---------------- alta ---------------- */
 let pending=null, fTheme="infra", fIcon="🚧", fColor=TH.infra.color;
 const scrim=document.getElementById("scrim"), form=document.getElementById("form");
 
@@ -775,13 +876,16 @@ function csv(){
     p.author||"Anónimo", p.lat, p.lng, p.supports||0].map(esc2).join(","));
   return [head.join(","), ...rows].join("\n");
 }
-document.getElementById("csvBtn").onclick = async ()=>{
+document.getElementById("csvBtn").onclick = ()=>{
   if(!points.length){ toast("📭 Todavía no hay datos para exportar."); return; }
-  let dl=null;
-  try{ dl = window.claude && claude.use ? await claude.use("downloads") : null; }catch(e){ dl=null; }
-  if(!dl){ toast("Acá no se puede descargar. Usá copiar al portapapeles."); return; }
-  try{ await dl.save({filename:"puntos-encuentro-santa-fe.csv", data:"\uFEFF"+csv()}); }
-  catch(e){ if(e && e.code!=="declined") toast("No se pudo guardar el archivo."); }
+  try{
+    const blob = new Blob(["\uFEFF"+csv()], {type:"text/csv;charset=utf-8"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "puntos-encuentro-santa-fe.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    toast("⬇️ CSV descargado.");
+  }catch(e){ toast("No se pudo descargar."); }
 };
 document.getElementById("copyBtn").onclick = async ()=>{
   if(!points.length){ toast("📭 Todavía no hay datos para copiar."); return; }
@@ -828,7 +932,7 @@ function ago(ts){
   return new Date(ts).toLocaleDateString("es-AR");
 }
 
-/* ---------------- efectos lúdicos ---------------- */
+/* ---------------- efectos ---------------- */
 function confetti(x, y){
   const colors = ['#F4B93E','#C2417A','#3C6CE0','#159E8B','#4C9A2A','#E08A1F'];
   for(let i=0;i<26;i++){
@@ -851,7 +955,6 @@ function confetti(x, y){
      .onfinish = () => p.remove();
   }
 }
-
 function heartBurst(x, y){
   for(let i=0;i<7;i++){
     const h = document.createElement('div');
@@ -876,6 +979,10 @@ setTimeout(()=>{ const h=document.getElementById("hint"); if(h) h.style.display=
 
 renderRail(); paintThemes(); paintIcons(); refresh();
 initStore();
+
+// Reintenta sincronizar cuando vuelve la conexión
+addEventListener("online", ()=>{ flushQueue(); refreshFromAPI(); });
+
 })();
 </script>
 </body>
