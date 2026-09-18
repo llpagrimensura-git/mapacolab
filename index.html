@@ -137,6 +137,7 @@ main{flex:1;position:relative;overflow:hidden}
   position:absolute;left:10px;bottom:16px;width:320px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);z-index:11;overflow:hidden;
   display:flex;flex-direction:column;max-height:min(72dvh,560px);
+  transition:max-height .22s ease;
 }
 .side-head{display:flex;align-items:center;gap:8px;padding:11px 13px 7px;flex:none}
 .side-head h3{font-size:14px;font-weight:700;margin:0}
@@ -220,6 +221,7 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 }
 .share-row button.wa:hover{filter:brightness(1.05)}
 
+/* ══════ POPUP BASE (desktop) ══════ */
 .pop{
   position:absolute;z-index:35;width:262px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);padding:13px;display:none;pointer-events:auto;
@@ -227,12 +229,50 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 }
 .pop.on{display:block}
 .pop .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;color:#fff}
-.pop p{margin:9px 0 6px;font-size:14.5px;line-height:1.35}
+.pop p{margin:9px 0 6px;font-size:14.5px;line-height:1.35;word-break:break-word}
 .pop .meta{font-size:12px;color:var(--ink-soft)}
 .pop .acts{display:flex;gap:7px;margin-top:11px}
-.pop .acts button{flex:1;border:1px solid var(--line);background:transparent;border-radius:10px;padding:8px;font-size:13.5px;font-weight:500}
+.pop .acts button{
+  flex:1 1 0;min-width:0;
+  border:1px solid var(--line);background:transparent;border-radius:10px;padding:8px;
+  font-size:13.5px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
 .pop .acts button:hover{border-color:var(--ink)}
 .pop .close{position:absolute;top:7px;right:7px;border:0;background:none;color:var(--ink-soft);font-size:15px}
+
+/* ══════ POPUP EN MOBILE (controlado por body.popup-mobile) ══════
+   Usamos !important para ganarle a los estilos inline left/top que
+   el JS pone en desktop. La clase .popup-mobile la agrega el JS al abrir. */
+body.popup-mobile .pop{
+  position:fixed !important;
+  left:8px !important;
+  right:8px !important;
+  bottom:calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  top:auto !important;
+  width:auto !important;
+  max-width:none !important;
+  max-height:70dvh !important;
+  overflow:auto !important;
+  -webkit-overflow-scrolling:touch;
+  transform:none !important;
+  padding:14px 14px 12px !important;
+  border-radius:16px !important;
+  z-index:45 !important;
+}
+body.popup-mobile .pop.on{
+  animation:popInMobile .28s cubic-bezier(.34,1.56,.64,1) both;
+}
+body.popup-mobile .pop .close{top:10px;right:10px}
+body.popup-mobile .pop p{font-size:15px}
+body.popup-mobile .pop .acts button{padding:10px 8px;font-size:14px}
+body.popup-mobile .side{display:none}
+
+@keyframes popInMobile{
+  0%   { transform:translateY(24px) scale(.97); opacity:0; }
+  70%  { transform:translateY(-3px) scale(1.01); opacity:1; }
+  100% { transform:translateY(0)    scale(1);    opacity:1; }
+}
 
 .pane{position:absolute;inset:0;overflow:auto;padding:20px 18px 40px}
 .pane-in{max-width:1000px;margin:0 auto}
@@ -326,25 +366,93 @@ td.txt{max-width:320px}
 }
 .toast.on{display:block}
 
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
 @media (max-width:760px){
-  header.bar{flex-wrap:wrap;gap:8px;padding:9px 11px}
-  .brand h1{font-size:17px}
+  header.bar{
+    flex-wrap:wrap;
+    gap:4px 6px;
+    padding:6px 10px;
+  }
+  .brand{gap:6px}
+  .brand h1{font-size:15px}
   .brand span{display:none}
-  .tabs{order:3;width:100%;justify-content:space-between}
-  .tabs button{flex:1}
-  .side{left:8px;right:8px;width:auto;bottom:8px;max-height:50dvh}
-  .feed{max-height:160px}
-  .hint{bottom:auto;top:56px}
-  .zoom{bottom:auto;top:56px;right:8px;flex-direction:row}
-  .sheet{top:auto;bottom:0;left:0;transform:none;width:100%;border-radius:22px 22px 0 0;max-height:90dvh}
-  .pop{position:fixed;left:8px;right:8px;bottom:8px;top:auto;width:auto;transform:none}
+  .status{font-size:11px;gap:4px}
+  .status span{display:none}
+  .dot{width:7px;height:7px}
+  .ghost{padding:5px 10px;font-size:12.5px;border-radius:999px}
+  .tabs{
+    order:3;width:100%;justify-content:space-between;
+    padding:2px;margin-top:2px;
+  }
+  .tabs button{flex:1;padding:5px 4px;font-size:12px}
+
+  .side{
+    left:8px;right:8px;width:auto;bottom:8px;
+    max-height:55dvh;
+    transition:max-height .22s ease;
+  }
+  .side.collapsed{
+    max-height:42px;
+    overflow:hidden;
+  }
+  .side.collapsed .feed{display:none}
+  .side-head{
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .side-head::after{
+    content:"▾";
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-left:2px;
+    transition:transform .2s;
+    flex:none;
+  }
+  .side.collapsed .side-head::after{transform:rotate(-90deg)}
+  .feed{max-height:none;min-height:0}
+
+  .hint{bottom:auto;top:58px;font-size:13px;padding:7px 14px}
+  .zoom{bottom:auto;top:58px;right:8px;flex-direction:row;gap:4px}
+  .zoom button{width:36px;height:36px;border-radius:10px;font-size:17px}
+  .rail{top:6px;left:6px;right:6px;gap:5px}
+  .chip{padding:5px 10px 5px 7px;font-size:12.5px}
+
+  .sheet{
+    top:auto;bottom:0;left:0;transform:none;
+    width:100%;border-radius:22px 22px 0 0;
+    max-height:92dvh;
+  }
+  .sheet-head{padding:14px 16px 4px}
+  .sheet-head h2{font-size:17px}
+  .sheet-body{padding:4px 16px 20px}
   .pane{padding:16px 12px 40px}
+  .pane h2{font-size:20px}
+  .pane .lead{font-size:13.5px}
   td.txt{max-width:none}
   table{font-size:12.5px}
+  th,td{padding:7px 8px}
   .charts-grid{grid-template-columns:1fr}
   .chart-card.wide{grid-column:auto}
+  .chart-wrap{height:200px}
+  .counter-hero{padding:20px 16px 16px;border-radius:16px}
+  .counter-main b{font-size:clamp(48px,14vw,72px)}
   .counter-row{grid-template-columns:1fr 1fr;gap:8px}
   .counter-cell:last-child{grid-column:1 / -1}
+  .counter-cell{padding:10px 8px}
+  .counter-cell b{font-size:22px}
+  .bar{grid-template-columns:90px 1fr 32px;gap:8px;font-size:12.5px}
+}
+
+@media (max-width:480px){
+  .brand h1{font-size:14px}
+  .tabs button{font-size:11.5px;padding:5px 2px}
+  .side.collapsed{max-height:40px}
+  .side-head{padding:8px 11px}
+  .side-head h3{font-size:13px}
 }
 
 @keyframes dropIn{
@@ -458,8 +566,8 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
         <button id="zout" aria-label="Alejar">–</button>
       </div>
       <div class="hint" id="hint">Tocá el mapa para marcar un punto</div>
-      <aside class="side">
-        <div class="side-head">
+      <aside class="side" id="sidePanel">
+        <div class="side-head" id="sideHead">
           <h3>Últimos aportes</h3>
           <span class="count-badge" id="feedCount">0</span>
           <button class="refresh" id="refreshFeed" type="button" aria-label="Actualizar" title="Actualizar">↻</button>
@@ -575,9 +683,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 (() => {
 "use strict";
 
-/* ═══════════════════════════════════════════════════════════════
-   CONFIGURACIÓN
-   ═══════════════════════════════════════════════════════════════ */
 const CONFIG = {
   API: "https://script.google.com/macros/s/AKfycbx94c2vV116-2GgEloovq0B6WKcSoBgOsrKkyTq0FwtXtjLJ_JIcVoW6fUtxJiBeWAF/exec",
   TIMEOUT: 10000,
@@ -585,13 +690,12 @@ const CONFIG = {
 };
 
 const HAS_API = () => !!CONFIG.API && /^https?:\/\//.test(CONFIG.API);
+const isMobile = () => matchMedia("(max-width:760px)").matches;
 
-/* DEBUG: activalo si querés ver en consola qué está pasando con el feed */
-const DEBUG = true;
+const DEBUG = false;
 function log(...a){ if(DEBUG) console.log("%c[mapa]", "color:#4E93AB;font-weight:bold", ...a); }
 function err(...a){ if(DEBUG) console.error("[mapa]", ...a); }
 
-/* ---------------- temáticas ---------------- */
 const THEMES = [
   {id:"ciudad",    name:"Ciudad",     color:"#4E93AB"},
   {id:"nutricion", name:"Nutrición",  color:"#E08A1F"},
@@ -603,7 +707,6 @@ const THEMES = [
 ];
 const TH = Object.fromEntries(THEMES.map(t=>[t.id,t]));
 
-/* ---------------- íconos ---------------- */
 const DEFAULT_ICON = "📍";
 const ICONS = [DEFAULT_ICON, "⭐", "💬", "🏙️", "🚦", "🌳", "🍎", "🎓", "🩺", "🎸", "🚧", "🚲"];
 
@@ -704,7 +807,6 @@ async function postToAPI(payload){
   const ctrl = new AbortController();
   const timer = setTimeout(()=>ctrl.abort(), CONFIG.TIMEOUT);
   try{
-    log("→ POST", payload);
     const res = await fetch(CONFIG.API, {
       method:"POST",
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
@@ -713,12 +815,9 @@ async function postToAPI(payload){
       redirect: "follow"
     });
     clearTimeout(timer);
-    const j = await res.json();
-    log("← respuesta", res.status, j);
-    return j;
+    return await res.json();
   }catch(e){
     clearTimeout(timer);
-    err("✗ falló el POST:", e.message);
     throw e;
   }
 }
@@ -727,7 +826,6 @@ async function flushQueue(){
   if(!HAS_API()) return;
   const q = queue.read();
   if(!q.length) return;
-  log("flushQueue: reintentando", q.length, "items");
   const still = [];
   for(const item of q){
     try{
@@ -739,17 +837,14 @@ async function flushQueue(){
   if(q.length !== still.length) refreshFromAPI();
 }
 
-/* ══════════════════ INIT ══════════════════ */
 async function initStore(){
   points = local.read();
-  log("initStore: leídos", points.length, "puntos de localStorage");
   refresh();
 
   if(!HAS_API()){
     setStatus(false, "Modo local (sin API)");
     return;
   }
-
   setStatus(false, "Sincronizando…");
   await refreshFromAPI();
   flushQueue();
@@ -758,29 +853,21 @@ async function initStore(){
 async function refreshFromAPI(){
   if(!HAS_API()) return;
   try{
-    log("GET lista de puntos…");
     const res = await fetch(CONFIG.API + "?action=list", {method:"GET", redirect:"follow"});
     const j = await res.json();
-    log("← lista:", j && j.points ? j.points.length + " puntos" : j);
     if(j && j.ok && Array.isArray(j.points)){
       const remote = j.points.map(normalizePoint).filter(Boolean);
       const remoteIds = new Set(remote.map(p=>p.id));
 
-      // Guardamos los timestamps locales para no perder el orden
       const localTs = new Map(points.map(p => [p.id, p.createdAt]));
-
-      // Los que vinieron de la API: si ya los conocíamos, conservamos su ts local
       const mergedRemote = remote.map(r => {
         const ts = localTs.get(r.id);
         return ts ? {...r, createdAt: ts} : r;
       });
 
-      // Los locales que la API todavía no devolvió (siguen en cola de propagación)
       const localOnly = points
         .filter(p => p._local && !remoteIds.has(p.id))
         .map(p => ({...p}));
-
-      if(localOnly.length) log("preservando", localOnly.length, "puntos locales todavía no propagados");
 
       points = [...localOnly, ...mergedRemote];
       local.write(points);
@@ -790,7 +877,6 @@ async function refreshFromAPI(){
       setStatus(false, "Modo local");
     }
   }catch(e){
-    err("falló refreshFromAPI:", e.message);
     setStatus(false, "Sin conexión · guardado local");
   }
 }
@@ -800,7 +886,6 @@ async function savePoint(p){
   points = [newLocal, ...points];
   local.write(points);
   refresh();
-  log("savePoint: punto agregado al inicio, total =", points.length);
 
   if(!HAS_API()) return true;
 
@@ -816,10 +901,8 @@ async function savePoint(p){
     const j = await postToAPI(payload);
     if(j && j.ok && j.id){
       newLocal.id = String(j.id);
-      // NO borrar _local: la planilla tarda en propagar.
       local.write(points); refresh();
     }else{
-      log("add rechazado, encolando:", j);
       queue.push(payload);
     }
   }catch(e){
@@ -938,32 +1021,47 @@ function openPop(p){
       <button data-a="sup">❤️ Apoyar ${p.supports?`(${p.supports})`:""}</button>
       <button data-a="near">🎯 Centrar</button>
     </div>`;
+
+  // ⚠ CLAVE: alternamos la clase popup-mobile en body.
+  // Esa clase fuerza (con !important) el layout de mobile, anulando los
+  // estilos inline left/top que hayan quedado de un resize previo.
+  document.body.classList.toggle("popup-mobile", isMobile());
+
   pop.classList.add("on");
   pop.querySelector(".close").onclick = closePop;
   pop.querySelector('[data-a="sup"]').onclick = ()=>bumpSupport(p);
   pop.querySelector('[data-a="near"]').onclick = ()=>flyTo(p);
+
   positionPop(p);
   positionMarkers();
 }
+
 function positionPop(p){
-  if(matchMedia("(max-width:760px)").matches) return;
+  // Limpiamos SIEMPRE los estilos inline antes de decidir.
+  // De este modo no quedan left/top pegados de una apertura previa en desktop.
+  pop.style.removeProperty("left");
+  pop.style.removeProperty("top");
+
+  if(isMobile()) return;      // mobile: el CSS se encarga
+
   const s = toScreen(p.lat,p.lng);
   const r = wrap.getBoundingClientRect();
   pop.style.left = Math.max(140, Math.min(r.width-140, s.x))+"px";
   pop.style.top = s.y+"px";
 }
-function closePop(){ selected=null; pop.classList.remove("on"); positionMarkers(); }
+
+function closePop(){
+  selected=null;
+  pop.classList.remove("on");
+  document.body.classList.remove("popup-mobile");
+  positionMarkers();
+}
 function flyTo(p){
   map.flyTo([p.lat,p.lng], Math.max(map.getZoom(),16), {duration:.6});
   openPop(p);
 }
 
-/* ─────────── FEED (últimos aportes) ───────────
-   Reglas:
-   1. Los puntos que el usuario acaba de crear (_local) SIEMPRE arriba.
-   2. Dentro de cada grupo, más nuevos primero (createdAt DESC).
-   3. Protegido contra createdAt inválidos (NaN, strings rotos, etc).
-*/
+/* ─────────── FEED ─────────── */
 const FEED_MAX = 10;
 
 function renderFeed(){
@@ -991,21 +1089,14 @@ function renderFeed(){
 
     const list = [...points]
       .sort((a,b) => {
-        // 1) _local primero (aunque tengan ts distintos)
         const la = a._local ? 1 : 0;
         const lb = b._local ? 1 : 0;
         if (lb !== la) return lb - la;
-        // 2) createdAt descendente, defendido contra NaN
         const ta = Number.isFinite(Number(a.createdAt)) ? Number(a.createdAt) : 0;
         const tb = Number.isFinite(Number(b.createdAt)) ? Number(b.createdAt) : 0;
         return tb - ta;
       })
       .slice(0, FEED_MAX);
-
-    if (DEBUG) {
-      log("renderFeed:", list.length, "items. local=", list.filter(p=>p._local).length,
-          "ids=", list.map(p=>({id:p.id.slice(-6), local:!!p._local, ts:p.createdAt, t:(p.text||"").slice(0,24)})));
-    }
 
     feed.innerHTML = list.map(p=>{
       const t = TH[p.theme]||TH.otro;
@@ -1024,7 +1115,6 @@ function renderFeed(){
       if(p){ active.add(p.theme); document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",active.has(c.dataset.t))); flyTo(p); }
     });
 
-    // Siempre arriba para que se vea el último
     feed.scrollTop = 0;
   } catch(e){
     err("renderFeed error:", e);
@@ -1049,7 +1139,6 @@ function renderTable(){
     </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-/* ══════════════════ CONTADOR ANIMADO ══════════════════ */
 function animateNumber(el, to, dur=700){
   if(!el) return;
   const from = Number(el.dataset.val || 0);
@@ -1065,14 +1154,11 @@ function animateNumber(el, to, dur=700){
   requestAnimationFrame(step);
 }
 
-/* ══════════════════ GRÁFICOS ══════════════════ */
 const charts = { donut:null, timeline:null };
-
 function isDark(){ return matchMedia("(prefers-color-scheme: dark)").matches; }
 
 function renderCharts(){
   if(typeof Chart === "undefined") return;
-
   const textColor = isDark() ? "#9DB2B8" : "#4A6672";
   const gridColor = isDark() ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.06)";
 
@@ -1219,7 +1305,6 @@ function renderCharts(){
   }
 }
 
-/* ══════════════════ ESTADÍSTICAS ══════════════════ */
 function renderStats(){
   const barsBox  = document.getElementById("bars");
   const elTotal  = document.getElementById("countTotal");
@@ -1345,7 +1430,6 @@ document.getElementById("send").onclick = async ()=>{
   toast("🎉 ¡Punto publicado! Gracias por el aporte.");
 };
 
-/* ══════════════════ EXPORTAR ══════════════════ */
 function csv(){
   const head = ["fecha","tematica","texto","autor","lat","lng","apoyos"];
   const esc2 = v => `"${String(v).replace(/"/g,'""')}"`;
@@ -1373,7 +1457,6 @@ document.getElementById("copyBtn").onclick = async ()=>{
   catch(e){ toast("🔒 El navegador bloqueó el portapapeles."); }
 };
 
-/* ══════════════════ COMPARTIR ══════════════════ */
 const SHARE_URL = /^https?:/.test(location.protocol)
   ? location.origin + location.pathname
   : "https://mapacolab.netlify.app/";
@@ -1416,6 +1499,32 @@ document.getElementById("shareRow").addEventListener("click", e=>{
   }
 });
 
+/* ══════════════════ PANEL COLAPSABLE (mobile) ══════════════════ */
+const sidePanel = document.getElementById("sidePanel");
+const sideHead  = document.getElementById("sideHead");
+
+function applySideState(){
+  if(!sidePanel) return;
+  if(isMobile()){
+    sidePanel.classList.add("collapsed");
+  }else{
+    sidePanel.classList.remove("collapsed");
+  }
+}
+applySideState();
+
+if(sideHead){
+  sideHead.addEventListener("click", (e)=>{
+    if(!isMobile()) return;
+    if(e.target.closest("#refreshFeed")) return;
+    sidePanel.classList.toggle("collapsed");
+  });
+}
+
+matchMedia("(max-width:760px)").addEventListener("change", ()=>{
+  applySideState();
+});
+
 /* ══════════════════ TABS + UTILIDADES ══════════════════ */
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected", x===b));
@@ -1441,7 +1550,6 @@ function ago(ts){
   return new Date(ts).toLocaleDateString("es-AR");
 }
 
-/* ══════════════════ EFECTOS ══════════════════ */
 function confetti(x, y){
   const colors = ['#F4B93E','#C2417A','#3C6CE0','#159E8B','#4C9A2A','#E08A1F'];
   for(let i=0;i<26;i++){
@@ -1482,15 +1590,14 @@ function heartBurst(x, y){
   }
 }
 
-/* ══════════════════ REFRESH MANUAL ══════════════════ */
 const refreshBtn = document.getElementById("refreshFeed");
-refreshBtn.onclick = async ()=>{
+refreshBtn.onclick = async (e)=>{
+  e.stopPropagation();
   refreshBtn.classList.add("spin");
   await refreshFromAPI();
   setTimeout(()=>refreshBtn.classList.remove("spin"), 700);
 };
 
-/* ══════════════════ AUTO-REFRESH ══════════════════ */
 let pollId = null;
 function startPoll(){
   if(pollId) return;
@@ -1504,7 +1611,6 @@ function startPoll(){
 function stopPoll(){ if(pollId){ clearInterval(pollId); pollId=null; } }
 document.addEventListener("visibilitychange", ()=>{ document.visibilityState==="visible" ? startPoll() : stopPoll(); });
 
-/* ══════════════════ ARRANQUE ══════════════════ */
 map.whenReady(()=>applyVB());
 setTimeout(()=>{ const h=document.getElementById("hint"); if(h) h.style.display="none"; }, 7000);
 
@@ -1513,10 +1619,8 @@ initStore();
 startPoll();
 
 addEventListener("online", ()=>{ flushQueue(); refreshFromAPI(); });
-
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>renderCharts());
 
-/* Herramienta de diagnóstico para la consola del navegador */
 window.__mapaDebug = {
   dump(){ console.table(points.map(p=>({id:p.id.slice(-6), local:p._local, ts:new Date(p.createdAt).toLocaleString("es-AR"), theme:p.theme, text:(p.text||"").slice(0,30)}))); },
   count(){ return { total: points.length, local: points.filter(p=>p._local).length }; },
