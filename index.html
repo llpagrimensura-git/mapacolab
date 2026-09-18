@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<title>Mapa #Encuentro · Santa Fe (DEMO)</title>
+<title>Mapa #Encuentro · Santa Fe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
@@ -108,10 +108,15 @@ main{flex:1;position:relative;overflow:hidden}
   position:absolute;top:-6px;right:-6px;background:var(--ink);color:var(--paper);
   font-size:11px;font-weight:700;border-radius:999px;padding:1px 6px;border:2px solid var(--card);
 }
+.mk.is-new .bub{box-shadow:0 0 0 0 rgba(194,65,122,.55);animation:newPing 1.6s ease-out 2}
+@keyframes newPing{
+  0%{box-shadow:0 0 0 0 rgba(194,65,122,.55)}
+  100%{box-shadow:0 0 0 18px rgba(194,65,122,0)}
+}
 .pending{position:absolute;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;
   border:3px dashed var(--hot);animation:pulse 1.4s infinite}
 @keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.22);opacity:.55}}
-@media (prefers-reduced-motion:reduce){.pending{animation:none}.mk{transition:none}}
+@media (prefers-reduced-motion:reduce){.pending,.mk.is-new .bub{animation:none}.mk{transition:none}}
 
 .rail{
   position:absolute;top:10px;left:10px;right:10px;display:flex;gap:7px;overflow-x:auto;
@@ -134,16 +139,37 @@ main{flex:1;position:relative;overflow:hidden}
 .zoom button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:19px;box-shadow:var(--shadow)}
 
 .side{
-  position:absolute;left:10px;bottom:16px;width:290px;background:var(--card);border:1px solid var(--line);
+  position:absolute;left:10px;bottom:16px;width:320px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);z-index:11;overflow:hidden;
+  display:flex;flex-direction:column;max-height:min(62dvh,440px);
 }
-.side h3{font-size:14px;padding:11px 13px 7px;font-weight:700}
-.feed{max-height:236px;overflow:auto;padding:0 6px 8px}
+.side-head{display:flex;align-items:center;gap:8px;padding:11px 13px 7px;flex:none}
+.side-head h3{font-size:14px;font-weight:700;margin:0}
+.side-head .count-badge{
+  background:var(--hot);color:#fff;font-size:11px;font-weight:700;
+  border-radius:999px;padding:1px 7px;font-variant-numeric:tabular-nums;
+}
+.side-head .refresh{
+  margin-left:auto;
+  border:1px solid var(--line);background:transparent;border-radius:8px;
+  width:26px;height:26px;display:grid;place-items:center;font-size:13px;padding:0;
+}
+.side-head .refresh:hover{border-color:var(--ink)}
+.side-head .refresh.spin{animation:spin .8s linear}
+@keyframes spin{to{transform:rotate(360deg)}}
+.feed{flex:1;overflow:auto;padding:0 6px 8px;scroll-behavior:smooth}
 .feed button{
   display:flex;gap:9px;width:100%;text-align:left;border:0;background:none;padding:8px 7px;border-radius:10px;align-items:flex-start;
+  position:relative;
 }
 .feed button:hover{background:var(--land-2)}
-.feed .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:14px;flex:none}
+.feed button.fresh-item{background:linear-gradient(90deg, rgba(194,65,122,.10), transparent 70%)}
+.feed button.fresh-item::after{
+  content:"nuevo";position:absolute;top:6px;right:8px;
+  font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;
+  background:var(--hot);color:#fff;border-radius:999px;padding:1px 6px;font-weight:700;
+}
+.feed .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none}
 .feed .ic i{width:9px;height:9px;border-radius:50%;display:block}
 .feed p{margin:0;font-size:13.5px;line-height:1.3}
 .feed small{color:var(--ink-soft);font-size:11.5px}
@@ -157,7 +183,7 @@ main{flex:1;position:relative;overflow:hidden}
   border-radius:20px;max-height:min(86dvh,720px);overflow:auto;border:1px solid var(--line);
 }
 .sheet.on{display:block}
-.sheet-head{display:flex;align-items:center;gap:10px;padding:16px 18px 6px;position:sticky;top:0;background:var(--card)}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:16px 18px 6px;position:sticky;top:0;background:var(--card);z-index:1}
 .sheet-head h2{font-size:19px}
 .sheet-head .x{margin-left:auto;border:0;background:var(--land-2);border-radius:50%;width:32px;height:32px;font-size:16px}
 .sheet-body{padding:6px 18px 20px}
@@ -186,19 +212,22 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 .cta[disabled]{opacity:.45}
 .note{font-size:12.5px;color:var(--ink-soft);margin-top:10px}
 
-/* ── compartir ── */
 .share-link{display:flex;gap:8px;align-items:stretch;margin:14px 0 4px}
 .share-link input{
   flex:1;min-width:0;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
   border-radius:12px;padding:12px;font:inherit;font-size:14px;
 }
 .share-link .cta{width:auto;flex:none;margin:0;padding:0 20px;font-size:15px;border-radius:12px}
-.share-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.share-row{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
 .share-row button{
   border:1.5px solid var(--line);background:var(--card);border-radius:12px;
-  padding:12px 10px;font-size:14px;font-weight:500;
+  padding:13px 10px;font-size:14.5px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.share-row button:hover{border-color:var(--ink)}
+.share-row button.wa{
+  background:#25D366;color:#fff;border-color:#1fb356;
+}
+.share-row button.wa:hover{filter:brightness(1.05)}
 .share-row button[hidden]{display:none}
 
 .pop{
@@ -226,7 +255,6 @@ tr:last-child td{border-bottom:0}
 td.txt{max-width:320px}
 .tools{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 
-/* ═══════════════ ESTADÍSTICAS ═══════════════ */
 .counter-hero{
   background:var(--card);
   border:1px solid var(--line);
@@ -293,7 +321,14 @@ td.txt{max-width:320px}
 .bars h3{font-size:13px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px}
 .bar{display:grid;grid-template-columns:120px 1fr 38px;align-items:center;gap:10px;margin-bottom:9px;font-size:13.5px}
 .bar .track{height:12px;background:var(--land-2);border-radius:999px;overflow:hidden}
-.bar .fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.bar .fill{
+  display:block;height:100%;border-radius:999px;
+  width:0;
+  background:var(--c, var(--water));
+  animation:growBar .7s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.bar .fill.no-anim{animation:none;width:var(--w,0%)}
+@keyframes growBar{to{width:var(--w,0%)}}
 .bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
 
 .toast{
@@ -308,7 +343,7 @@ td.txt{max-width:320px}
   .brand span{display:none}
   .tabs{order:3;width:100%;justify-content:space-between}
   .tabs button{flex:1}
-  .side{left:8px;right:8px;width:auto;bottom:8px}
+  .side{left:8px;right:8px;width:auto;bottom:8px;max-height:44dvh}
   .feed{max-height:120px}
   .hint{bottom:auto;top:56px}
   .zoom{bottom:auto;top:56px;right:8px;flex-direction:row}
@@ -321,7 +356,6 @@ td.txt{max-width:320px}
   .chart-card.wide{grid-column:auto}
   .counter-row{grid-template-columns:1fr 1fr;gap:8px}
   .counter-cell:last-child{grid-column:1 / -1}
-  .share-row{grid-template-columns:1fr}
 }
 
 @keyframes dropIn{
@@ -347,7 +381,7 @@ td.txt{max-width:320px}
   70%{transform:translate(-50%,calc(-100% - 52px)) scale(1.05) rotate(2deg);opacity:1}
   100%{transform:translate(-50%,calc(-100% - 52px)) scale(1) rotate(0);opacity:1}
 }
-@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes slideUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes ring{0%{transform:translate(-50%,-50%) scale(.4);opacity:.9}100%{transform:translate(-50%,-50%) scale(3);opacity:0}}
 @keyframes shine{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes squash{0%{transform:scale(1)}40%{transform:scale(.94,.9)}70%{transform:scale(1.05,1.07)}100%{transform:scale(1)}}
@@ -368,15 +402,7 @@ td.txt{max-width:320px}
 .chip:active{animation:squash .3s}
 .chip[aria-pressed="true"]{background:linear-gradient(180deg,var(--card),var(--land-2))}
 .pop.on{animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
-.feed button{animation:slideUp .4s ease both;transition:transform .15s, background .2s}
-.feed button:nth-child(1){animation-delay:0s}
-.feed button:nth-child(2){animation-delay:.05s}
-.feed button:nth-child(3){animation-delay:.1s}
-.feed button:nth-child(4){animation-delay:.15s}
-.feed button:nth-child(5){animation-delay:.2s}
-.feed button:nth-child(6){animation-delay:.25s}
-.feed button:nth-child(7){animation-delay:.3s}
-.feed button:nth-child(8){animation-delay:.35s}
+.feed button{transition:transform .15s, background .2s}
 .feed button:hover{transform:translateX(4px)}
 
 button{transition:transform .12s ease, box-shadow .2s, background .2s, border-color .2s, color .2s}
@@ -419,7 +445,7 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
   <header class="bar">
     <div class="brand">
       <h1>Mapa #Encuentro</h1>
-      <span>DEMO</span>
+      <span>Santa Fe</span>
     </div>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="mapa">🗺️ Mapa</button>
@@ -445,7 +471,11 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
       </div>
       <div class="hint" id="hint">Tocá el mapa para marcar un punto</div>
       <aside class="side">
-        <h3>Últimos aportes</h3>
+        <div class="side-head">
+          <h3>Últimos aportes</h3>
+          <span class="count-badge" id="feedCount">0</span>
+          <button class="refresh" id="refreshFeed" type="button" aria-label="Actualizar" title="Actualizar">↻</button>
+        </div>
         <div class="feed" id="feed"></div>
       </aside>
     </section>
@@ -467,7 +497,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
         <h2>Qué está diciendo la gente</h2>
         <p class="lead">Lectura rápida de lo que se cargó durante el Encuentro.</p>
 
-        <!-- Contador gigante -->
         <div class="counter-hero">
           <div class="counter-main">
             <b id="countTotal">0</b>
@@ -489,7 +518,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
           </div>
         </div>
 
-        <!-- Gráficos -->
         <div class="charts-grid">
           <div class="chart-card">
             <h3>Distribución por temática</h3>
@@ -515,8 +543,6 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     <button class="x" id="formX" aria-label="Cerrar">✕</button>
   </div>
   <div class="sheet-body">
-    <div id="coords" class="note" style="margin-top:0"></div>
-
     <label class="f">Temática</label>
     <div class="grid-th" id="themes"></div>
 
@@ -532,7 +558,7 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     <div class="check"><input type="checkbox" id="anon"><label for="anon">Publicar de forma anónima</label></div>
 
     <button class="cta" id="send">Publicar punto</button>
-    <p class="note">No guardamos datos personales. Se registra la IP en forma anonimizada solo para moderar y frenar abusos.</p>
+    <p class="note">Se registra la IP de forma anónima.</p>
   </div>
 </div>
 
@@ -542,7 +568,7 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     <button class="x" id="qrX" aria-label="Cerrar">✕</button>
   </div>
   <div class="sheet-body">
-    <p class="note" style="margin-top:0">Copiá el link y pegalo en el grupo de WhatsApp, en el mail o donde te sirva. Se abre en cualquier celular, sin instalar nada.</p>
+    <p class="note" style="margin-top:0">Copiá el link y pegalo donde quieras, o compartilo directo por WhatsApp.</p>
 
     <div class="share-link">
       <input type="text" id="shareUrl" readonly spellcheck="false" aria-label="Link del mapa">
@@ -550,13 +576,8 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     </div>
 
     <div class="share-row" id="shareRow">
-      <button data-s="wa">WhatsApp</button>
-      <button data-s="tg">Telegram</button>
-      <button data-s="mail">Email</button>
-      <button data-s="native" id="nativeShare" hidden>Más opciones…</button>
+      <button data-s="wa" class="wa">💬 Compartir por WhatsApp</button>
     </div>
-
-    <p class="note">También podés proyectarlo en pantalla durante el Encuentro y que la gente escanee… o simplemente escribir la dirección a mano. 😉</p>
   </div>
 </div>
 
@@ -571,17 +592,18 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
    ═══════════════════════════════════════════════════════════════ */
 const CONFIG = {
   API: "https://script.google.com/macros/s/AKfycbx94c2vV116-2GgEloovq0B6WKcSoBgOsrKkyTq0FwtXtjLJ_JIcVoW6fUtxJiBeWAF/exec",
-  TIMEOUT: 10000
+  TIMEOUT: 10000,
+  POLL_MS: 60000
 };
 
 const HAS_API = () => !!CONFIG.API && /^https?:\/\//.test(CONFIG.API);
 
-/* ═══ DEBUG · borrar en producción ═══ */
-const DEBUG = true;
+/* ═══ DEBUG ═══ */
+const DEBUG = false;
 function log(...a){ if(DEBUG) console.log("%c[mapa]", "color:#4E93AB;font-weight:bold", ...a); }
-function err(...a){ console.error("[mapa]", ...a); }
+function err(...a){ if(DEBUG) console.error("[mapa]", ...a); }
 
-/* ---------------- temáticas (sin íconos) ---------------- */
+/* ---------------- temáticas ---------------- */
 const THEMES = [
   {id:"ciudad",    name:"Ciudad",     color:"#4E93AB"},
   {id:"nutricion", name:"Nutrición",  color:"#E08A1F"},
@@ -593,14 +615,15 @@ const THEMES = [
 ];
 const TH = Object.fromEntries(THEMES.map(t=>[t.id,t]));
 
-/* ---------------- íconos de los puntos (lista única) ---------------- */
-const ICONS = ["📍","⭐","💬","🏙️","🚦","🌳","🍎","🎓","🩺","🎸","🚧","🚲"];
+/* ---------------- íconos ---------------- */
+const DEFAULT_ICON = "📍";
+const ICONS = [DEFAULT_ICON, "⭐", "💬", "🏙️", "🚦", "🌳", "🍎", "🎓", "🩺", "🎸", "🚧", "🚲"];
 
 const BBOX = {n:-31.55, s:-31.73, w:-60.78, e:-60.58};
 const BAD = ["puto","idiota","imbecil","imbécil","pelotudo","forro"];
 const LIMIT = 6, WINDOW_MS = 10*60*1000;
 
-/* ---------------- mapa ---------------- */
+/* ══════════════════ MAPA ══════════════════ */
 const wrap = document.getElementById("mapwrap");
 const overlay = document.getElementById("overlay");
 
@@ -637,13 +660,47 @@ map.on("click", e => {
 document.getElementById("zin").onclick  = ()=>map.zoomIn();
 document.getElementById("zout").onclick = ()=>map.zoomOut();
 
-/* ---------------- almacenamiento ---------------- */
+/* ══════════════════ ALMACENAMIENTO ══════════════════ */
 let points = [];
 const uid = () => Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
 
+function normalizePoint(p){
+  if(!p || typeof p !== "object") return null;
+  const rawTs = p.createdAt ?? p.fecha ?? p.timestamp ?? p.date ?? Date.now();
+  let ts;
+  if(typeof rawTs === "number") ts = rawTs;
+  else {
+    const parsed = new Date(rawTs).getTime();
+    ts = Number.isFinite(parsed) ? parsed : Date.now();
+  }
+  const lat = Number(p.lat ?? p.latitud);
+  const lng = Number(p.lng ?? p.lon ?? p.longitud);
+  if(!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  const theme = (p.theme && TH[p.theme]) ? p.theme : "otro";
+  return {
+    id: String(p.id || uid()),
+    lat, lng,
+    theme,
+    icon: p.icon || DEFAULT_ICON,
+    color: p.color || TH[theme].color,
+    text: String(p.text ?? p.texto ?? "").slice(0,280),
+    author: String(p.author ?? p.autor ?? "").slice(0,40),
+    supports: Number(p.supports ?? p.apoyos ?? 0) || 0,
+    createdAt: ts,
+    _local: !!p._local
+  };
+}
+
 const local = {
-  read(){ try{ return JSON.parse(localStorage.getItem("puntos_encuentro")||"[]"); }catch(e){ return []; } },
-  write(list){ try{ localStorage.setItem("puntos_encuentro", JSON.stringify(list)); }catch(e){} }
+  read(){
+    try{
+      const raw = JSON.parse(localStorage.getItem("puntos_encuentro")||"[]");
+      return raw.map(normalizePoint).filter(Boolean);
+    }catch(e){ return []; }
+  },
+  write(list){
+    try{ localStorage.setItem("puntos_encuentro", JSON.stringify(list)); }catch(e){}
+  }
 };
 
 const QUEUE_KEY = "puntos_encuentro_queue";
@@ -694,7 +751,7 @@ async function flushQueue(){
   if(q.length !== still.length) refreshFromAPI();
 }
 
-/* ---------------- init ---------------- */
+/* ══════════════════ INIT ══════════════════ */
 async function initStore(){
   points = local.read();
   refresh();
@@ -717,9 +774,24 @@ async function refreshFromAPI(){
     const j = await res.json();
     log("← lista:", j && j.points ? j.points.length + " puntos" : j);
     if(j && j.ok && Array.isArray(j.points)){
-      const remoteIds = new Set(j.points.map(p=>p.id));
-      const localOnly = points.filter(p=>p._local && !remoteIds.has(p.id));
-      points = [...localOnly, ...j.points].sort((a,b)=>b.createdAt-a.createdAt);
+      const remote = j.points.map(normalizePoint).filter(Boolean);
+      const remoteIds = new Set(remote.map(p=>p.id));
+
+      // ── Preservamos el createdAt local para los puntos que ya conocíamos ──
+      // Esto evita que un cambio de formato de fecha en la planilla reordene
+      // todo y haga "saltar" puntos al tope del feed.
+      const localTs = new Map(points.map(p => [p.id, p.createdAt]));
+      const mergedRemote = remote.map(r => {
+        const ts = localTs.get(r.id);
+        return ts ? {...r, createdAt: ts} : r;
+      });
+
+      // Los locales que todavía no aparecen en la planilla se conservan.
+      const localOnly = points
+        .filter(p => p._local && !remoteIds.has(p.id))
+        .map(p => ({...p}));
+
+      points = [...localOnly, ...mergedRemote].sort((a,b)=>b.createdAt-a.createdAt);
       local.write(points);
       setStatus(true, "Conectado · planilla");
       refresh();
@@ -733,7 +805,7 @@ async function refreshFromAPI(){
 }
 
 async function savePoint(p){
-  const newLocal = {id:uid(), ...p, _local:true};
+  const newLocal = normalizePoint({id:uid(), ...p, _local:true});
   points = [newLocal, ...points];
   local.write(points); refresh();
 
@@ -750,8 +822,9 @@ async function savePoint(p){
   try{
     const j = await postToAPI(payload);
     if(j && j.ok && j.id){
-      newLocal.id = j.id;
-      delete newLocal._local;
+      newLocal.id = String(j.id);
+      // ⚠ NO borrar _local: la planilla tarda en propagar.
+      // Se limpia solo cuando el punto aparece en la lista remota.
       local.write(points); refresh();
     }else{
       log("add rechazado, encolando:", j);
@@ -806,7 +879,7 @@ function setStatus(live, text){
   s.innerHTML = `<i class="dot${live?" live":""}"></i><span>${text}</span>`;
 }
 
-/* ---------------- render ---------------- */
+/* ══════════════════ RENDER ══════════════════ */
 let active = new Set(THEMES.map(t=>t.id));
 let selected = null;
 
@@ -841,7 +914,7 @@ function renderMarkers(){
       rendered.add(p.id);
     }
 
-    b.innerHTML = `<div class="bub" style="background:${p.color}"><em>${p.icon||"📍"}</em></div>`+
+    b.innerHTML = `<div class="bub" style="background:${p.color}"><em>${p.icon||DEFAULT_ICON}</em></div>`+
       (p.supports? `<span class="sup">+${p.supports}</span>`:"");
     b.onclick = ev => { ev.stopPropagation(); openPop(p); };
     overlay.appendChild(b);
@@ -898,24 +971,57 @@ function flyTo(p){
   openPop(p);
 }
 
+/* ─────────── FEED (últimos aportes) ───────────
+   · Orden: SIEMPRE más nuevos arriba (sort por createdAt desc).
+   · Los puntos locales que todavía no volvieron de la planilla
+     también cuentan (quedan marcados con _local y tienen prioridad
+     por tener createdAt más reciente).
+   · Se hace scroll al tope cuando aparece un ID nuevo.
+   · Se marca con "nuevo" los que se publicaron en los últimos 60s.
+*/
+const FEED_MAX = 8;
+let lastFeedTopId = null;
+
 function renderFeed(){
   const feed = document.getElementById("feed");
-  const list = [...points].sort((a,b)=>b.createdAt-a.createdAt).slice(0,8);
+  const badge = document.getElementById("feedCount");
+  if(badge) badge.textContent = String(points.length);
+
+  // orden defensivo: más nuevos primero
+  const list = [...points]
+    .sort((a,b)=> (b.createdAt||0) - (a.createdAt||0))
+    .slice(0, FEED_MAX);
+
   if(!list.length){
     feed.innerHTML = `<div class="empty">Todavía no hay puntos cargados. Tocá cualquier lugar del mapa para publicar el primero.</div>`;
+    lastFeedTopId = null;
     return;
   }
+
+  const now = Date.now();
+  const topId = list[0].id;
+  const isNewTop = lastFeedTopId !== null && topId !== lastFeedTopId;
+
   feed.innerHTML = list.map(p=>{
     const t = TH[p.theme]||TH.otro;
-    return `<button data-id="${p.id}">
+    const snippet = p.text.length>74 ? p.text.slice(0,74)+"…" : p.text;
+    const isFresh = (now - p.createdAt) < 60000;   // último minuto
+    return `<button data-id="${p.id}" type="button" class="${isFresh?"fresh-item":""}">
       <span class="ic" style="background:${p.color}1f"><i style="background:${p.color}"></i></span>
-      <span><p>${esc(p.text.slice(0,74))}${p.text.length>74?"…":""}</p>
-      <small>${t.name} · ${esc(p.author||"Anónimo")} · ${ago(p.createdAt)}</small></span></button>`;
+      <span style="min-width:0;flex:1">
+        <p>${esc(snippet)}</p>
+        <small>${t.name} · ${esc(p.author||"Anónimo")} · ${ago(p.createdAt)}</small>
+      </span></button>`;
   }).join("");
+
   feed.querySelectorAll("button").forEach(b=>b.onclick=()=>{
     const p = points.find(q=>q.id===b.dataset.id);
     if(p){ active.add(p.theme); document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",active.has(c.dataset.t))); flyTo(p); }
   });
+
+  // Si apareció un punto nuevo arriba, subimos el scroll para que se vea.
+  if(isNewTop) feed.scrollTop = 0;
+  lastFeedTopId = topId;
 }
 
 function renderTable(){
@@ -954,9 +1060,6 @@ function animateNumber(el, to, dur=700){
 const charts = { donut:null, timeline:null };
 
 function isDark(){ return matchMedia("(prefers-color-scheme: dark)").matches; }
-function cssVar(name){
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
 
 function renderCharts(){
   if(typeof Chart === "undefined") return;
@@ -964,7 +1067,6 @@ function renderCharts(){
   const textColor = isDark() ? "#9DB2B8" : "#4A6672";
   const gridColor = isDark() ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.06)";
 
-  // ── Dona por temática ──
   const counts = THEMES.map(t => ({
     name: t.name,
     color: t.color,
@@ -1028,7 +1130,6 @@ function renderCharts(){
     }
   }
 
-  // ── Línea de aportes por día ──
   const timelineCanvas = document.getElementById("chartTimeline");
   if(timelineCanvas){
     const byDay = {};
@@ -1050,8 +1151,8 @@ function renderCharts(){
       }
     }else{
       labels = days.map(d => {
-        const [y,m,dd] = d.split("-");
-        return `${dd}/${m}`;
+        const parts = d.split("-");
+        return `${parts[2]}/${parts[1]}`;
       });
       values = days.map(d => byDay[d]);
     }
@@ -1131,29 +1232,51 @@ function renderStats(){
   animateNumber(elPeople, autores.size);
   if(elTop) elTop.textContent = total ? top.t.name : "—";
 
-  if(barsBox){
-    if(total === 0){
-      barsBox.innerHTML = `<h3>Ranking</h3><p class="lead" style="margin:0">Todavía no hay datos. Cuando se carguen puntos, acá vas a ver el ranking por temática.</p>`;
-    }else{
-      const max = Math.max(1, ...counts.map(c => c.n));
-      barsBox.innerHTML = `<h3>Ranking</h3>` + counts.map(c => `
-        <div class="bar">
-          <span>${c.t.name}</span>
-          <span class="track"><span class="fill" style="width:${(c.n/max*100).toFixed(1)}%;background:${c.t.color}"></span></span>
-          <span class="n">${c.n}</span>
-        </div>`).join("");
-    }
-  }
+  renderBars(counts, total);
 
   renderCharts();
 }
 
+/* ─────────── RANKING (barras por temática) ───────────
+   Cada barra se pinta con el color del tema y crece
+   desde 0 hasta su valor con una animación.
+*/
+let lastBarsSig = "";
+function renderBars(counts, total){
+  const barsBox = document.getElementById("bars");
+  if(!barsBox) return;
+
+  if(total === 0){
+    if(lastBarsSig !== "empty"){
+      lastBarsSig = "empty";
+      barsBox.innerHTML = `<h3>Ranking</h3><p class="lead" style="margin:0">Todavía no hay datos. Cuando se carguen puntos, acá vas a ver el ranking por temática.</p>`;
+    }
+    return;
+  }
+
+  const sig = counts.map(c => `${c.t.id}:${c.n}`).join("|");
+  if(sig === lastBarsSig) return;   // sin cambios → no re-animamos
+  lastBarsSig = sig;
+
+  const max = Math.max(1, ...counts.map(c => c.n));
+  barsBox.innerHTML = `<h3>Ranking</h3>` + counts.map(c => {
+    const pct = (c.n / max * 100).toFixed(1);
+    return `<div class="bar">
+      <span>${c.t.name}</span>
+      <span class="track">
+        <span class="fill" style="--w:${pct}%; --c:${c.t.color}"></span>
+      </span>
+      <span class="n">${c.n}</span>
+    </div>`;
+  }).join("");
+}
+
 function refresh(){ renderMarkers(); renderFeed(); renderTable(); renderStats(); }
 
-/* ---------------- alta ---------------- */
+/* ══════════════════ ALTA ══════════════════ */
 let pending=null;
 let fTheme = THEMES[0].id;
-let fIcon  = ICONS[0];
+let fIcon  = DEFAULT_ICON;
 let fColor = THEMES[0].color;
 const scrim=document.getElementById("scrim"), form=document.getElementById("form");
 
@@ -1162,8 +1285,10 @@ function openForm(geo){
     toast("📍 Ese punto queda fuera de la ciudad de Santa Fe."); return;
   }
   pending = geo; closePop(); renderMarkers();
-  document.getElementById("coords").textContent =
-    `Punto en ${geo.lat.toFixed(5)}, ${geo.lng.toFixed(5)}`;
+
+  fIcon = DEFAULT_ICON;
+  paintIcons();
+
   scrim.classList.add("on"); form.classList.add("on");
   document.getElementById("txt").focus({preventScroll:true});
 }
@@ -1173,7 +1298,7 @@ scrim.onclick = ()=>{ closeForm(); closeQR(); };
 
 function paintThemes(){
   document.getElementById("themes").innerHTML = THEMES.map(t=>
-    `<button class="th" data-t="${t.id}" aria-pressed="${t.id===fTheme}">
+    `<button class="th" data-t="${t.id}" aria-pressed="${t.id===fTheme}" type="button">
       <i style="background:${t.color}1f"><b style="background:${t.color}"></b></i>${t.name}</button>`).join("");
   document.querySelectorAll("#themes .th").forEach(b=>b.onclick=()=>{
     fTheme=b.dataset.t; fColor=TH[fTheme].color;
@@ -1182,7 +1307,7 @@ function paintThemes(){
 }
 function paintIcons(){
   document.getElementById("icons").innerHTML = ICONS.map(i=>
-    `<button class="ico" data-i="${i}" aria-pressed="${i===fIcon}">${i}</button>`).join("");
+    `<button class="ico" data-i="${i}" aria-pressed="${i===fIcon}" type="button">${i}</button>`).join("");
   document.querySelectorAll("#icons .ico").forEach(b=>b.onclick=()=>{ fIcon=b.dataset.i; paintIcons(); });
 }
 const txt = document.getElementById("txt");
@@ -1216,7 +1341,7 @@ document.getElementById("send").onclick = async ()=>{
   toast("🎉 ¡Punto publicado! Gracias por el aporte.");
 };
 
-/* ---------------- exportar ---------------- */
+/* ══════════════════ EXPORTAR ══════════════════ */
 function csv(){
   const head = ["fecha","tematica","texto","autor","lat","lng","apoyos"];
   const esc2 = v => `"${String(v).replace(/"/g,'""')}"`;
@@ -1242,11 +1367,10 @@ document.getElementById("copyBtn").onclick = async ()=>{
   catch(e){ toast("🔒 El navegador bloqueó el portapapeles."); }
 };
 
-/* ---------------- COMPARTIR ---------------- */
+/* ══════════════════ COMPARTIR ══════════════════ */
 const SHARE_URL = /^https?:/.test(location.protocol)
   ? location.origin + location.pathname
   : "https://mapacolab.netlify.app/";
-const SHARE_TITLE = "Mapa #Encuentro · Santa Fe";
 const SHARE_TEXT  = "Mirá el Mapa #Encuentro de Santa Fe y sumá tu punto:";
 
 const qr = document.getElementById("qr");
@@ -1283,21 +1407,9 @@ document.getElementById("shareRow").addEventListener("click", e=>{
   const u = encodeURIComponent(SHARE_URL);
   const t = encodeURIComponent(SHARE_TEXT);
   if(s==="wa")   window.open(`https://wa.me/?text=${t}%20${u}`, "_blank", "noopener");
-  if(s==="tg")   window.open(`https://t.me/share/url?url=${u}&text=${t}`, "_blank", "noopener");
-  if(s==="mail") location.href = `mailto:?subject=${encodeURIComponent(SHARE_TITLE)}&body=${t}%20${u}`;
 });
 
-const nativeBtn = document.getElementById("nativeShare");
-if(navigator.share){
-  nativeBtn.hidden = false;
-  nativeBtn.onclick = ()=>{
-    navigator.share({ title: SHARE_TITLE, text: SHARE_TEXT, url: SHARE_URL }).catch(()=>{});
-  };
-}else{
-  nativeBtn.hidden = true;
-}
-
-/* ---------------- tabs + utilidades ---------------- */
+/* ══════════════════ TABS + UTILIDADES ══════════════════ */
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected", x===b));
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id==="v-"+b.dataset.tab));
@@ -1322,7 +1434,7 @@ function ago(ts){
   return new Date(ts).toLocaleDateString("es-AR");
 }
 
-/* ---------------- efectos ---------------- */
+/* ══════════════════ EFECTOS ══════════════════ */
 function confetti(x, y){
   const colors = ['#F4B93E','#C2417A','#3C6CE0','#159E8B','#4C9A2A','#E08A1F'];
   for(let i=0;i<26;i++){
@@ -1363,16 +1475,38 @@ function heartBurst(x, y){
   }
 }
 
-/* ---------------- arranque ---------------- */
+/* ══════════════════ REFRESH MANUAL ══════════════════ */
+const refreshBtn = document.getElementById("refreshFeed");
+refreshBtn.onclick = async ()=>{
+  refreshBtn.classList.add("spin");
+  await refreshFromAPI();
+  setTimeout(()=>refreshBtn.classList.remove("spin"), 700);
+};
+
+/* ══════════════════ AUTO-REFRESH ══════════════════ */
+let pollId = null;
+function startPoll(){
+  if(pollId) return;
+  pollId = setInterval(()=>{
+    const mapTab = document.querySelector('.tabs button[data-tab="mapa"]');
+    if(mapTab && mapTab.getAttribute("aria-selected")==="true" && document.visibilityState==="visible"){
+      refreshFromAPI();
+    }
+  }, CONFIG.POLL_MS);
+}
+function stopPoll(){ if(pollId){ clearInterval(pollId); pollId=null; } }
+document.addEventListener("visibilitychange", ()=>{ document.visibilityState==="visible" ? startPoll() : stopPoll(); });
+
+/* ══════════════════ ARRANQUE ══════════════════ */
 map.whenReady(()=>applyVB());
 setTimeout(()=>{ const h=document.getElementById("hint"); if(h) h.style.display="none"; }, 7000);
 
 renderRail(); paintThemes(); paintIcons(); refresh();
 initStore();
+startPoll();
 
 addEventListener("online", ()=>{ flushQueue(); refreshFromAPI(); });
 
-// Redibujar gráficos si cambia el modo claro/oscuro
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>renderCharts());
 
 })();
