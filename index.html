@@ -28,7 +28,6 @@
   --radius:14px;
   color-scheme:light;
 }
-:root:not([data-theme="light"]){}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --ink:#E7EFEC;
@@ -65,7 +64,6 @@ h1,h2,h3,.display{font-family:"Bricolage Grotesque",Karla,sans-serif;font-weight
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--signal);outline-offset:2px;border-radius:6px}
 
-/* ---------- shell ---------- */
 .app{display:flex;flex-direction:column;height:100dvh;min-height:100dvh}
 header.bar{
   display:flex;align-items:center;gap:12px;padding:10px 14px;
@@ -88,7 +86,6 @@ main{flex:1;position:relative;overflow:hidden}
 .view{position:absolute;inset:0;display:none}
 .view.on{display:block}
 
-/* ---------- map ---------- */
 #mapwrap{position:absolute;inset:0;touch-action:none;background:var(--land);cursor:crosshair}
 #lmap{position:absolute;inset:0;width:100%;height:100%;background:var(--land);z-index:0;isolation:isolate}
 .overlay{z-index:5}
@@ -151,7 +148,6 @@ main{flex:1;position:relative;overflow:hidden}
 .feed small{color:var(--ink-soft);font-size:11.5px}
 .empty{padding:6px 13px 14px;color:var(--ink-soft);font-size:13.5px}
 
-/* ---------- sheet / modal ---------- */
 .scrim{position:fixed;inset:0;background:rgba(10,28,35,.44);z-index:60;display:none}
 .scrim.on{display:block}
 .sheet{
@@ -188,7 +184,6 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 .cta[disabled]{opacity:.45}
 .note{font-size:12.5px;color:var(--ink-soft);margin-top:10px}
 
-/* popup */
 .pop{
   position:absolute;z-index:35;width:262px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);padding:13px;display:none;pointer-events:auto;
@@ -203,7 +198,6 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 .pop .acts button:hover{border-color:var(--ink)}
 .pop .close{position:absolute;top:7px;right:7px;border:0;background:none;color:var(--ink-soft);font-size:15px}
 
-/* ---------- tables / stats ---------- */
 .pane{position:absolute;inset:0;overflow:auto;padding:20px 18px 40px}
 .pane-in{max-width:900px;margin:0 auto}
 .pane h2{font-size:24px;margin-bottom:4px}
@@ -221,7 +215,7 @@ td.txt{max-width:320px}
 .bars{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px}
 .bar{display:grid;grid-template-columns:120px 1fr 38px;align-items:center;gap:10px;margin-bottom:9px;font-size:13.5px}
 .bar .track{height:12px;background:var(--land-2);border-radius:999px;overflow:hidden}
-.bar .fill{height:100%;border-radius:999px}
+.bar .fill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
 .bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
 
 .qr{display:grid;grid-template-columns:repeat(21,1fr);width:172px;height:172px;margin:6px auto 10px;background:#fff;padding:8px;border-radius:10px}
@@ -249,7 +243,6 @@ td.txt{max-width:320px}
   table{font-size:12.5px}
 }
 
-/* ═══════════════════ LÚDICO ═══════════════════ */
 @keyframes dropIn{
   0%{transform:translate(-50%,-200%) scale(.2) rotate(-30deg);opacity:0}
   55%{transform:translate(-50%,-92%) scale(1.2) rotate(9deg);opacity:1}
@@ -262,7 +255,7 @@ td.txt{max-width:320px}
   75%{transform:translate(-50%,-100%) rotate(9deg) scale(1.18)}
 }
 @keyframes heartbeat{
-  0%,100%{transform:translate(-50%,-50%) scale(1)}
+  0%{transform:translate(-50%,-50%) scale(1)}
   15%{transform:translate(-50%,-50%) scale(1.32)}
   30%{transform:translate(-50%,-50%) scale(.95)}
   45%{transform:translate(-50%,-50%) scale(1.22)}
@@ -329,6 +322,11 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 </style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  if (typeof L === "undefined") {
+    document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
+  }
+</script>
 <body>
 <div class="app">
   <header class="bar">
@@ -410,7 +408,7 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 
     <label class="f" for="who">Tu nombre <span>· opcional</span></label>
     <input type="text" id="who" maxlength="40" placeholder="Tu nombre o el de tu organización">
-    <div class="check"><input type="checkbox" id="anon" checked><label for="anon">Publicar de forma anónima</label></div>
+    <div class="check"><input type="checkbox" id="anon"><label for="anon">Publicar de forma anónima</label></div>
 
     <button class="cta" id="send">Publicar punto</button>
     <p class="note">No guardamos datos personales. Se registra la IP en forma anonimizada solo para moderar y frenar abusos.</p>
@@ -439,10 +437,15 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
    ═══════════════════════════════════════════════════════════════ */
 const CONFIG = {
   API: "https://script.google.com/macros/s/AKfycbx94c2vV116-2GgEloovq0B6WKcSoBgOsrKkyTq0FwtXtjLJ_JIcVoW6fUtxJiBeWAF/exec",
-  TIMEOUT: 8000
+  TIMEOUT: 10000
 };
 
 const HAS_API = () => !!CONFIG.API && /^https?:\/\//.test(CONFIG.API);
+
+/* ═══ DEBUG · borrar en producción ═══ */
+const DEBUG = true;
+function log(...a){ if(DEBUG) console.log("%c[mapa]", "color:#4E93AB;font-weight:bold", ...a); }
+function err(...a){ console.error("[mapa]", ...a); }
 
 /* ---------------- temáticas e íconos ---------------- */
 const THEMES = [
@@ -505,7 +508,6 @@ const local = {
   write(list){ try{ localStorage.setItem("puntos_encuentro", JSON.stringify(list)); }catch(e){} }
 };
 
-/* ──────────── cola de sincronización para offline ──────────── */
 const QUEUE_KEY = "puntos_encuentro_queue";
 const queue = {
   read(){ try{ return JSON.parse(localStorage.getItem(QUEUE_KEY)||"[]"); }catch(e){ return []; } },
@@ -515,10 +517,11 @@ const queue = {
 };
 
 async function postToAPI(payload){
-  if(!HAS_API()) return null;
+  if(!HAS_API()){ log("sin API · modo local"); return null; }
   const ctrl = new AbortController();
   const timer = setTimeout(()=>ctrl.abort(), CONFIG.TIMEOUT);
   try{
+    log("→ POST", payload);
     const res = await fetch(CONFIG.API, {
       method:"POST",
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
@@ -527,9 +530,12 @@ async function postToAPI(payload){
       redirect: "follow"
     });
     clearTimeout(timer);
-    return await res.json();
+    const j = await res.json();
+    log("← respuesta", res.status, j);
+    return j;
   }catch(e){
     clearTimeout(timer);
+    err("✗ falló el POST:", e.message);
     throw e;
   }
 }
@@ -538,20 +544,20 @@ async function flushQueue(){
   if(!HAS_API()) return;
   const q = queue.read();
   if(!q.length) return;
-  const pending = [];
+  log("flushQueue: reintentando", q.length, "items");
+  const still = [];
   for(const item of q){
     try{
       const j = await postToAPI(item);
-      if(!j || !j.ok) pending.push(item);
-    }catch(e){ pending.push(item); }
+      if(!j || !j.ok) still.push(item);
+    }catch(e){ still.push(item); }
   }
-  queue.write(pending);
-  if(q.length !== pending.length) refreshFromAPI();
+  queue.write(still);
+  if(q.length !== still.length) refreshFromAPI();
 }
 
-/* ---------------- init y sync con Apps Script ---------------- */
+/* ---------------- init ---------------- */
 async function initStore(){
-  // 1) pintamos local primero
   points = local.read();
   refresh();
 
@@ -560,19 +566,18 @@ async function initStore(){
     return;
   }
 
-  // 2) traemos todo desde la planilla
   setStatus(false, "Sincronizando…");
   await refreshFromAPI();
-
-  // 3) vaciamos la cola de pendientes
   flushQueue();
 }
 
 async function refreshFromAPI(){
   if(!HAS_API()) return;
   try{
+    log("GET lista de puntos…");
     const res = await fetch(CONFIG.API + "?action=list", {method:"GET", redirect:"follow"});
     const j = await res.json();
+    log("← lista:", j && j.points ? j.points.length + " puntos" : j);
     if(j && j.ok && Array.isArray(j.points)){
       const remoteIds = new Set(j.points.map(p=>p.id));
       const localOnly = points.filter(p=>p._local && !remoteIds.has(p.id));
@@ -584,6 +589,7 @@ async function refreshFromAPI(){
       setStatus(false, "Modo local");
     }
   }catch(e){
+    err("falló refreshFromAPI:", e.message);
     setStatus(false, "Sin conexión · guardado local");
   }
 }
@@ -610,6 +616,7 @@ async function savePoint(p){
       delete newLocal._local;
       local.write(points); refresh();
     }else{
+      log("add rechazado, encolando:", j);
       queue.push(payload);
     }
   }catch(e){
@@ -626,12 +633,34 @@ async function bumpSupport(p){
   if(btn){ const r = btn.getBoundingClientRect(); heartBurst(r.left + r.width/2, r.top + r.height/2); }
   openPop(p);
 
-  if(!HAS_API() || p._local) {
-    if(p._local) queue.push({action:"support", id:p.id});
+  if(!HAS_API()){
+    log("apoyo: sin API, solo local");
+    toast("❤️ Apoyo guardado localmente");
     return;
   }
-  try{ await postToAPI({action:"support", id:p.id}); }
-  catch(e){ queue.push({action:"support", id:p.id}); }
+
+  if(p._local){
+    log("apoyo: punto local, encolado hasta sincronizar", p.id);
+    queue.push({action:"support", id:p.id});
+    toast("❤️ Apoyo guardado. Se sincroniza al conectar.");
+    return;
+  }
+
+  try{
+    const j = await postToAPI({action:"support", id:p.id});
+    if(j && j.ok){
+      if(typeof j.apoyos === "number") p.supports = j.apoyos;
+      local.write(points); refresh(); openPop(p);
+      toast(`❤️ Apoyo registrado (${p.supports})`);
+    }else{
+      log("apoyo rechazado por el server:", j);
+      queue.push({action:"support", id:p.id});
+      toast("❤️ Apoyo en cola. Se reintenta solo.");
+    }
+  }catch(e){
+    queue.push({action:"support", id:p.id});
+    toast("📶 Sin red. Apoyo en cola.");
+  }
 }
 
 function setStatus(live, text){
@@ -753,6 +782,7 @@ function renderFeed(){
 
 function renderTable(){
   const box = document.getElementById("tableBox");
+  if(!box) return;
   if(!points.length){ box.innerHTML = `<p class="lead">Sin datos todavía.</p>`; return; }
   const rows = [...points].sort((a,b)=>b.createdAt-a.createdAt).map(p=>`<tr>
     <td>${new Date(p.createdAt).toLocaleString("es-AR")}</td>
@@ -767,20 +797,37 @@ function renderTable(){
 }
 
 function renderStats(){
+  const statsBox = document.getElementById("stats");
+  const barsBox  = document.getElementById("bars");
+  if(!statsBox || !barsBox) return;
+
   const total = points.length;
-  const counts = THEMES.map(t=>({t, n:points.filter(p=>p.theme===t.id).length})).sort((a,b)=>b.n-a.n);
-  const sup = points.reduce((s,p)=>s+(p.supports||0),0);
+  const counts = THEMES.map(t => ({
+    t,
+    n: points.filter(p => p.theme === t.id).length
+  })).sort((a,b) => b.n - a.n);
+  const sup = points.reduce((s,p) => s + (p.supports||0), 0);
+  const autores = new Set(points.map(p => p.author || "anon"));
   const top = counts[0];
-  document.getElementById("stats").innerHTML = `
+
+  statsBox.innerHTML = `
     <div class="stat"><b>${total}</b><span>puntos cargados</span></div>
     <div class="stat"><b>${sup}</b><span>apoyos</span></div>
-    <div class="stat"><b>${total?top.t.name:"—"}</b><span>temática más marcada</span></div>
-    <div class="stat"><b>${new Set(points.map(p=>p.author||"anon")).size}</b><span>personas que aportaron</span></div>`;
-  const max = Math.max(1, ...counts.map(c=>c.n));
-  document.getElementById("bars").innerHTML = counts.map(c=>`
-    <div class="bar"><span>${c.t.name}</span>
-      <span class="track"><span class="fill" style="width:${c.n/max*100}%;background:${c.t.color}"></span></span>
-      <span class="n">${c.n}</span></div>`).join("");
+    <div class="stat"><b>${total ? top.t.name : "—"}</b><span>temática más marcada</span></div>
+    <div class="stat"><b>${autores.size}</b><span>personas que aportaron</span></div>`;
+
+  if(total === 0){
+    barsBox.innerHTML = `<p class="lead" style="margin:0">Todavía no hay datos. Cuando se carguen puntos, acá vas a ver la distribución por temática.</p>`;
+    return;
+  }
+
+  const max = Math.max(1, ...counts.map(c => c.n));
+  barsBox.innerHTML = counts.map(c => `
+    <div class="bar">
+      <span>${c.t.name}</span>
+      <span class="track"><span class="fill" style="width:${(c.n/max*100).toFixed(1)}%;background:${c.t.color}"></span></span>
+      <span class="n">${c.n}</span>
+    </div>`).join("");
 }
 
 function refresh(){ renderMarkers(); renderFeed(); renderTable(); renderStats(); }
@@ -895,11 +942,15 @@ document.getElementById("qrBtn").onclick = ()=>{
   }
   qr.classList.add("on"); scrim.classList.add("on");
 };
+
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected", x===b));
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id==="v-"+b.dataset.tab));
-  if(b.dataset.tab==="mapa") requestAnimationFrame(applyVB);
+  if(b.dataset.tab==="mapa")     requestAnimationFrame(applyVB);
+  if(b.dataset.tab==="datos")    renderStats();
+  if(b.dataset.tab==="planilla") renderTable();
 });
+
 addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeForm(); closeQR(); closePop(); } });
 
 let tt;
@@ -964,7 +1015,6 @@ setTimeout(()=>{ const h=document.getElementById("hint"); if(h) h.style.display=
 renderRail(); paintThemes(); paintIcons(); refresh();
 initStore();
 
-// Reintenta sincronizar cuando vuelve la conexión
 addEventListener("online", ()=>{ flushQueue(); refreshFromAPI(); });
 
 })();
