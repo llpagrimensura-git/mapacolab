@@ -130,11 +130,11 @@ main{flex:1;position:relative;overflow:hidden}
   background:var(--ink);color:var(--paper);border-radius:999px;padding:9px 18px;font-size:14px;
   box-shadow:var(--shadow);
 }
-.zoom{position:absolute;right:10px;bottom:74px;display:flex;flex-direction:column;gap:6px;z-index:12}
+.zoom{position:absolute;left:10px;bottom:74px;display:flex;flex-direction:column;gap:6px;z-index:12}
 .zoom button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:19px;box-shadow:var(--shadow)}
 
 .side{
-  position:absolute;left:10px;bottom:16px;width:320px;background:var(--card);border:1px solid var(--line);
+  position:absolute;right:10px;bottom:16px;width:320px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);z-index:11;overflow:hidden;
   display:flex;flex-direction:column;max-height:min(72dvh,560px);
   transition:max-height .22s ease;
@@ -204,6 +204,10 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 .cta[disabled]{opacity:.45}
 .note{font-size:12.5px;color:var(--ink-soft);margin-top:10px}
 
+.two-col{display:flex;gap:10px}
+.two-col > div{flex:1;min-width:0}
+@media (max-width:420px){ .two-col{gap:8px} }
+
 .share-link{display:flex;gap:8px;align-items:stretch;margin:14px 0 4px}
 .share-link input{
   flex:1;min-width:0;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
@@ -241,9 +245,7 @@ textarea:focus,input:focus{border-color:var(--ink);outline:none}
 .pop .acts button:hover{border-color:var(--ink)}
 .pop .close{position:absolute;top:7px;right:7px;border:0;background:none;color:var(--ink-soft);font-size:15px}
 
-/* ══════ POPUP EN MOBILE (controlado por body.popup-mobile) ══════
-   Usamos !important para ganarle a los estilos inline left/top que
-   el JS pone en desktop. La clase .popup-mobile la agrega el JS al abrir. */
+/* ══════ POPUP EN MOBILE ══════ */
 body.popup-mobile .pop{
   position:fixed !important;
   left:8px !important;
@@ -416,7 +418,7 @@ td.txt{max-width:320px}
   .feed{max-height:none;min-height:0}
 
   .hint{bottom:auto;top:58px;font-size:13px;padding:7px 14px}
-  .zoom{bottom:auto;top:58px;right:8px;flex-direction:row;gap:4px}
+  .zoom{bottom:auto;top:58px;left:8px;flex-direction:row;gap:4px}
   .zoom button{width:36px;height:36px;border-radius:10px;font-size:17px}
   .rail{top:6px;left:6px;right:6px;gap:5px}
   .chip{padding:5px 10px 5px 7px;font-size:12.5px}
@@ -545,12 +547,11 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     </div>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="mapa">🗺️ Mapa</button>
-      <button role="tab" aria-selected="false" data-tab="planilla">📋 Planilla</button>
       <button role="tab" aria-selected="false" data-tab="datos">📊 Datos</button>
     </div>
     <div class="spacer"></div>
     <div class="status" id="status"><i class="dot"></i><span>Cargando</span></div>
-    <button class="ghost" id="qrBtn">Compartir</button>
+    <button class="ghost" id="qrBtn" style="display:none">Compartir</button>
   </header>
 
   <main>
@@ -576,22 +577,15 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
       </aside>
     </section>
 
-    <section class="view" id="v-planilla">
-      <div class="pane"><div class="pane-in">
-        <h2>Planilla de aportes</h2>
-        <p class="lead">Todos los puntos cargados, en crudo. Esta vista es el insumo para armar proyectos: se puede descargar y abrir en una hoja de cálculo.</p>
-        <div class="tools">
-          <button class="ghost" id="csvBtn">Descargar CSV</button>
-          <button class="ghost" id="copyBtn">Copiar al portapapeles</button>
-        </div>
-        <div id="tableBox"></div>
-      </div></div>
-    </section>
-
     <section class="view" id="v-datos">
       <div class="pane"><div class="pane-in">
         <h2>Qué está diciendo la gente</h2>
         <p class="lead">Lectura rápida de lo que se cargó durante el Encuentro.</p>
+
+        <div class="tools" style="margin-bottom:20px">
+          <button class="ghost" id="csvBtn">⬇️ Descargar CSV</button>
+          <button class="ghost" id="copyBtn">📋 Copiar datos</button>
+        </div>
 
         <div class="counter-hero">
           <div class="counter-main">
@@ -649,12 +643,19 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
     <textarea id="txt" rows="3" maxlength="280" placeholder="Contá qué pasa en este lugar…"></textarea>
     <div class="count" id="count">0 / 280</div>
 
-    <label class="f" for="who">Tu nombre <span>· opcional</span></label>
-    <input type="text" id="who" maxlength="40" placeholder="Tu nombre o el de tu organización">
+    <div class="two-col">
+      <div>
+        <label class="f" for="who">Tu nombre <span>· opcional</span></label>
+        <input type="text" id="who" maxlength="40" placeholder="Tu nombre u organización">
+      </div>
+      <div>
+        <label class="f" for="contact">Tu contacto <span>· opcional</span></label>
+        <input type="text" id="contact" maxlength="60" placeholder="Mail, teléfono o red social">
+      </div>
+    </div>
     <div class="check"><input type="checkbox" id="anon"><label for="anon">Publicar de forma anónima</label></div>
 
     <button class="cta" id="send">Publicar punto</button>
-    <p class="note">Se registra la IP de forma anónima.</p>
   </div>
 </div>
 
@@ -776,6 +777,7 @@ function normalizePoint(p){
     color: p.color || TH[theme].color,
     text: String(p.text ?? p.texto ?? "").slice(0,280),
     author: String(p.author ?? p.autor ?? "").slice(0,40),
+    contact: String(p.contact ?? p.contacto ?? "").slice(0,60),
     supports: Number(p.supports ?? p.apoyos ?? 0) || 0,
     createdAt: ts,
     _local: !!p._local
@@ -862,7 +864,7 @@ async function refreshFromAPI(){
       const localTs = new Map(points.map(p => [p.id, p.createdAt]));
       const mergedRemote = remote.map(r => {
         const ts = localTs.get(r.id);
-        return ts ? {...r, createdAt: ts} : r;
+        return ts ? {...r, createdAt: ts, _local: false} : {...r, _local: false};
       });
 
       const localOnly = points
@@ -894,6 +896,7 @@ async function savePoint(p){
     lat:newLocal.lat, lng:newLocal.lng,
     theme:newLocal.theme, icon:newLocal.icon, color:newLocal.color,
     text:newLocal.text, author:newLocal.author,
+    contact:newLocal.contact,
     ua: navigator.userAgent
   };
 
@@ -901,6 +904,7 @@ async function savePoint(p){
     const j = await postToAPI(payload);
     if(j && j.ok && j.id){
       newLocal.id = String(j.id);
+      newLocal._local = false;
       local.write(points); refresh();
     }else{
       queue.push(payload);
@@ -1022,9 +1026,6 @@ function openPop(p){
       <button data-a="near">🎯 Centrar</button>
     </div>`;
 
-  // ⚠ CLAVE: alternamos la clase popup-mobile en body.
-  // Esa clase fuerza (con !important) el layout de mobile, anulando los
-  // estilos inline left/top que hayan quedado de un resize previo.
   document.body.classList.toggle("popup-mobile", isMobile());
 
   pop.classList.add("on");
@@ -1037,12 +1038,10 @@ function openPop(p){
 }
 
 function positionPop(p){
-  // Limpiamos SIEMPRE los estilos inline antes de decidir.
-  // De este modo no quedan left/top pegados de una apertura previa en desktop.
   pop.style.removeProperty("left");
   pop.style.removeProperty("top");
 
-  if(isMobile()) return;      // mobile: el CSS se encarga
+  if(isMobile()) return;
 
   const s = toScreen(p.lat,p.lng);
   const r = wrap.getBoundingClientRect();
@@ -1087,11 +1086,9 @@ function renderFeed(){
       return;
     }
 
+    // Orden estrictamente cronológico: el más nuevo primero.
     const list = [...points]
-      .sort((a,b) => {
-        const la = a._local ? 1 : 0;
-        const lb = b._local ? 1 : 0;
-        if (lb !== la) return lb - la;
+      .sort((a, b) => {
         const ta = Number.isFinite(Number(a.createdAt)) ? Number(a.createdAt) : 0;
         const tb = Number.isFinite(Number(b.createdAt)) ? Number(b.createdAt) : 0;
         return tb - ta;
@@ -1119,24 +1116,6 @@ function renderFeed(){
   } catch(e){
     err("renderFeed error:", e);
   }
-}
-
-function renderTable(){
-  const box = document.getElementById("tableBox");
-  if(!box) return;
-  if(!points.length){ box.innerHTML = `<p class="lead">Sin datos todavía.</p>`; return; }
-  const rows = [...points]
-    .sort((a,b)=> (Number(b.createdAt)||0) - (Number(a.createdAt)||0))
-    .map(p=>`<tr>
-      <td>${new Date(p.createdAt).toLocaleString("es-AR")}</td>
-      <td>${(TH[p.theme]||TH.otro).name}</td>
-      <td class="txt">${esc(p.text)}</td>
-      <td>${esc(p.author||"Anónimo")}</td>
-      <td>${p.lat.toFixed(5)}</td><td>${p.lng.toFixed(5)}</td>
-      <td>${p.supports||0}</td></tr>`).join("");
-  box.innerHTML = `<table><thead><tr>
-    <th>Fecha</th><th>Temática</th><th>Aporte</th><th>Quién</th><th>Lat</th><th>Lng</th><th>Apoyos</th>
-    </tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function animateNumber(el, to, dur=700){
@@ -1360,7 +1339,7 @@ function renderBars(counts, total){
   }).join("");
 }
 
-function refresh(){ renderMarkers(); renderFeed(); renderTable(); renderStats(); }
+function refresh(){ renderMarkers(); renderFeed(); renderStats(); }
 
 /* ══════════════════ ALTA ══════════════════ */
 let pending=null;
@@ -1412,12 +1391,15 @@ document.getElementById("send").onclick = async ()=>{
   sent = sent.filter(t=>now-t < WINDOW_MS);
   if(sent.length >= LIMIT){ toast("⏳ Llegaste al máximo de aportes por ahora. Probá en unos minutos."); return; }
 
-  const anon = document.getElementById("anon").checked;
-  const who = document.getElementById("who").value.trim();
+  const anon    = document.getElementById("anon").checked;
+  const who     = document.getElementById("who").value.trim();
+  const contact = (document.getElementById("contact")?.value || "").trim();
   const p = {
     lat:+pending.lat.toFixed(6), lng:+pending.lng.toFixed(6),
     theme:fTheme, icon:fIcon, color:fColor, text, supports:0,
-    author: anon||!who ? "" : who, createdAt: now
+    author:  anon || !who ? "" : who,
+    contact: anon ? "" : contact,
+    createdAt: now
   };
   const btn = document.getElementById("send"); btn.disabled = true; btn.textContent = "Publicando…";
   const ok = await savePoint(p);
@@ -1425,19 +1407,21 @@ document.getElementById("send").onclick = async ()=>{
   if(!ok) return;
   sent.push(now);
   txt.value=""; document.getElementById("count").textContent="0 / 280";
+  document.getElementById("who").value="";
+  const cEl = document.getElementById("contact"); if(cEl) cEl.value="";
   closeForm();
   confetti(innerWidth/2, innerHeight*0.65);
   toast("🎉 ¡Punto publicado! Gracias por el aporte.");
 };
 
 function csv(){
-  const head = ["fecha","tematica","texto","autor","lat","lng","apoyos"];
+  const head = ["fecha","tematica","texto","autor","contacto","lat","lng","apoyos"];
   const esc2 = v => `"${String(v).replace(/"/g,'""')}"`;
   const rows = [...points]
     .sort((a,b)=> (Number(b.createdAt)||0) - (Number(a.createdAt)||0))
     .map(p=>[
       new Date(p.createdAt).toISOString(), (TH[p.theme]||TH.otro).name, p.text,
-      p.author||"Anónimo", p.lat, p.lng, p.supports||0].map(esc2).join(","));
+      p.author||"Anónimo", p.contact||"", p.lat, p.lng, p.supports||0].map(esc2).join(","));
   return [head.join(","), ...rows].join("\n");
 }
 document.getElementById("csvBtn").onclick = ()=>{
@@ -1529,9 +1513,8 @@ matchMedia("(max-width:760px)").addEventListener("change", ()=>{
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected", x===b));
   document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id==="v-"+b.dataset.tab));
-  if(b.dataset.tab==="mapa")     requestAnimationFrame(applyVB);
-  if(b.dataset.tab==="datos")    requestAnimationFrame(renderStats);
-  if(b.dataset.tab==="planilla") renderTable();
+  if(b.dataset.tab==="mapa")  requestAnimationFrame(applyVB);
+  if(b.dataset.tab==="datos") requestAnimationFrame(renderStats);
 });
 
 addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeForm(); closeQR(); closePop(); } });
