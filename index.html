@@ -859,20 +859,29 @@ async function flushQueue(){
 }
 
 async function initStore(){
-  points = local.read();
-  refresh();
-
   if(!HAS_API()){
+    // Sin API configurada: no hay planilla de la cual leer, usamos lo local.
+    points = local.read();
+    refresh();
     setStatus(false, "Modo local (sin API)");
     return;
   }
-  setStatus(false, "Sincronizando…");
-  await refreshFromAPI();
+
+  setStatus(false, "Cargando desde la planilla…");
+  const ok = await refreshFromAPI();
+
+  if(!ok){
+    // Sólo si falló la conexión recurrimos a la última copia guardada localmente.
+    points = local.read();
+    refresh();
+    setStatus(false, "Sin conexión · mostrando copia guardada");
+  }
+
   flushQueue();
 }
 
 async function refreshFromAPI(){
-  if(!HAS_API()) return;
+  if(!HAS_API()) return false;
   try{
     const res = await fetch(CONFIG.API + "?action=list&_=" + Date.now(), {
       method:"GET",
@@ -884,6 +893,10 @@ async function refreshFromAPI(){
       const remote = j.points.map(normalizePoint).filter(Boolean);
       const remoteIds = new Set(remote.map(p=>p.id));
 
+      // Sólo se conservan puntos locales que todavía están en la cola
+      // de envío (aún no confirmados por la planilla). Cualquier otro
+      // punto viejo que haya quedado en el navegador se descarta acá:
+      // la planilla es siempre la fuente de verdad.
       const queuedIds = new Set(
         queue.read().map(q => String(q.id||'')).filter(Boolean)
       );
@@ -903,11 +916,14 @@ async function refreshFromAPI(){
       local.write(points);
       setStatus(true, "Conectado · planilla");
       refresh();
+      return true;
     }else{
       setStatus(false, "Modo local");
+      return false;
     }
   }catch(e){
     setStatus(false, "Sin conexión · guardado local");
+    return false;
   }
 }
 	
