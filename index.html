@@ -874,11 +874,24 @@ async function initStore(){
 async function refreshFromAPI(){
   if(!HAS_API()) return;
   try{
-    const res = await fetch(CONFIG.API + "?action=list", {method:"GET", redirect:"follow"});
+    const res = await fetch(CONFIG.API + "?action=list&_=" + Date.now(), {
+      method:"GET",
+      redirect: "follow",
+      cache: "no-store"
+    });
     const j = await res.json();
     if(j && j.ok && Array.isArray(j.points)){
       const remote = j.points.map(normalizePoint).filter(Boolean);
       const remoteIds = new Set(remote.map(p=>p.id));
+
+      const queuedIds = new Set(
+        queue.read().map(q => String(q.id||'')).filter(Boolean)
+      );
+      const localPending = points.filter(p =>
+        p._local &&
+        !remoteIds.has(p.id) &&
+        queuedIds.has(p.id)
+      );
 
       const localTs = new Map(points.map(p => [p.id, p.createdAt]));
       const mergedRemote = remote.map(r => {
@@ -886,11 +899,7 @@ async function refreshFromAPI(){
         return ts ? {...r, createdAt: ts, _local: false} : {...r, _local: false};
       });
 
-      const localOnly = points
-        .filter(p => p._local && !remoteIds.has(p.id))
-        .map(p => ({...p}));
-
-      points = [...localOnly, ...mergedRemote];
+      points = [...localPending, ...mergedRemote];
       local.write(points);
       setStatus(true, "Conectado · planilla");
       refresh();
@@ -901,7 +910,7 @@ async function refreshFromAPI(){
     setStatus(false, "Sin conexión · guardado local");
   }
 }
-
+	
 async function savePoint(p){
   const newLocal = normalizePoint({id:uid(), ...p, _local:true});
   points = [newLocal, ...points];
