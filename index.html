@@ -69,9 +69,10 @@ header.bar{
   display:flex;align-items:center;gap:12px;padding:10px 14px;
   background:var(--card);border-bottom:1px solid var(--line);flex:none;z-index:40;
 }
-.brand{display:flex;align-items:baseline;gap:8px;min-width:0}
-.brand h1{font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brand span{font-size:12.5px;color:var(--ink-soft);white-space:nowrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-logo{display:block;width:auto;object-fit:contain;flex:none}
+.brand-logo-1{height:70px}
+.brand-logo-2{height:40px}
 .spacer{flex:1}
 .tabs{display:flex;gap:2px;background:var(--land-2);padding:3px;border-radius:999px}
 .tabs button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-size:14px;font-weight:500;color:var(--ink-soft)}
@@ -134,7 +135,7 @@ main{flex:1;position:relative;overflow:hidden}
 .zoom button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:19px;box-shadow:var(--shadow)}
 
 .side{
-  position:absolute;right:10px;bottom:16px;width:320px;background:var(--card);border:1px solid var(--line);
+  position:absolute;right:10px;bottom:74px;width:320px;background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:var(--shadow);z-index:11;overflow:hidden;
   display:flex;flex-direction:column;max-height:min(72dvh,560px);
   transition:max-height .22s ease;
@@ -268,7 +269,7 @@ body.popup-mobile .pop.on{
 body.popup-mobile .pop .close{top:10px;right:10px}
 body.popup-mobile .pop p{font-size:15px}
 body.popup-mobile .pop .acts button{padding:10px 8px;font-size:14px}
-body.popup-mobile .side{display:none}
+body.popup-mobile .side:not(.in-header){display:none}
 
 @keyframes popInMobile{
   0%   { transform:translateY(24px) scale(.97); opacity:0; }
@@ -377,9 +378,9 @@ td.txt{max-width:320px}
     gap:4px 6px;
     padding:6px 10px;
   }
-  .brand{gap:6px}
-  .brand h1{font-size:15px}
-  .brand span{display:none}
+  .brand{gap:8px}
+  .brand-logo-1{height:26px}
+  .brand-logo-2{height:30px}
   .status{font-size:11px;gap:4px}
   .status span{display:none}
   .dot{width:7px;height:7px}
@@ -417,6 +418,18 @@ td.txt{max-width:320px}
   .side.collapsed .side-head::after{transform:rotate(-90deg)}
   .feed{max-height:none;min-height:0}
 
+  /* ── Últimos aportes dentro del header (mobile) ── */
+  header.bar .side{
+    position:static;
+    order:4;
+    width:100%;
+    left:auto; right:auto; top:auto; bottom:auto;
+    max-height:44dvh;
+    margin-top:4px;
+    border-radius:14px;
+  }
+  header.bar .side.collapsed{ max-height:42px; }
+
   .hint{bottom:auto;top:58px;font-size:13px;padding:7px 14px}
   .zoom{bottom:auto;top:58px;left:8px;flex-direction:row;gap:4px}
   .zoom button{width:36px;height:36px;border-radius:10px;font-size:17px}
@@ -450,9 +463,11 @@ td.txt{max-width:320px}
 }
 
 @media (max-width:480px){
-  .brand h1{font-size:14px}
+  .brand-logo-1{height:20px}
+  .brand-logo-2{height:24px}
   .tabs button{font-size:11.5px;padding:5px 2px}
   .side.collapsed{max-height:40px}
+  header.bar .side.collapsed{max-height:40px}
   .side-head{padding:8px 11px}
   .side-head h3{font-size:13px}
 }
@@ -542,9 +557,8 @@ button{transition:transform .12s ease, box-shadow .2s, background .2s, border-co
 <div class="app">
   <header class="bar">
     <div class="brand">
-      <h1>Mapa #Encuentro</h1>
-      <span>Santa Fe</span>
-    </div>
+	  <img src="logo1.png" alt="#Encuentro"  class="brand-logo brand-logo-1">
+      </div>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="mapa">🗺️ Mapa</button>
       <button role="tab" aria-selected="false" data-tab="datos">📊 Datos</button>
@@ -697,19 +711,24 @@ const DEBUG = false;
 function log(...a){ if(DEBUG) console.log("%c[mapa]", "color:#4E93AB;font-weight:bold", ...a); }
 function err(...a){ if(DEBUG) console.error("[mapa]", ...a); }
 
+/* ── TEMÁTICAS NUEVAS ── */
 const THEMES = [
-  {id:"ciudad",    name:"Ciudad",     color:"#4E93AB"},
-  {id:"nutricion", name:"Nutrición",  color:"#E08A1F"},
-  {id:"educacion", name:"Educación",  color:"#3C6CE0"},
-  {id:"salud",     name:"Salud",      color:"#D7365E"},
-  {id:"juventud",  name:"Juventud",   color:"#8B44D8"},
-  {id:"obras",     name:"Obras",      color:"#6A6F8C"},
-  {id:"otro",      name:"Otro",       color:"#5A6B72"}
+  {id:"caries",    name:"Caries Urbanas", color:"#D7365E"},
+  {id:"ciudad",    name:"Ciudad",         color:"#4E93AB"},
+  {id:"movilidad", name:"Movilidad",      color:"#3C6CE0"},
+  {id:"salud",     name:"Salud",          color:"#159E8B"},
+  {id:"infancias", name:"Infancias",      color:"#E08A1F"},
+  {id:"juventud",  name:"Juventud",       color:"#8B44D8"}
 ];
 const TH = Object.fromEntries(THEMES.map(t=>[t.id,t]));
+const FALLBACK_THEME = "ciudad";   // usada si llega un theme viejo/desconocido
 
 const DEFAULT_ICON = "📍";
-const ICONS = [DEFAULT_ICON, "⭐", "💬", "🏙️", "🚦", "🌳", "🍎", "🎓", "🩺", "🎸", "🚧", "🚲"];
+const ICONS = [
+  "📍", "⚠️", "💬",
+  "🐀", "🌱", "😷", "🚕", "🚶‍♀️", "🛴", "🙅",
+  "🎲", "👶", "🎯", "🌙", "🌳", "💡", "♻️", "👷‍♂️", "🚧"
+];
 
 const BBOX = {n:-31.55, s:-31.73, w:-60.78, e:-60.58};
 const BAD = ["puto","idiota","imbecil","imbécil","pelotudo","forro"];
@@ -768,7 +787,7 @@ function normalizePoint(p){
   const lat = Number(p.lat ?? p.latitud);
   const lng = Number(p.lng ?? p.lon ?? p.longitud);
   if(!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-  const theme = (p.theme && TH[p.theme]) ? p.theme : "otro";
+  const theme = (p.theme && TH[p.theme]) ? p.theme : FALLBACK_THEME;
   return {
     id: String(p.id || uid()),
     lat, lng,
@@ -1015,7 +1034,7 @@ function positionMarkers(){
 const pop = document.getElementById("pop");
 function openPop(p){
   selected = p.id;
-  const t = TH[p.theme]||TH.otro;
+  const t = TH[p.theme] || TH[FALLBACK_THEME];
   pop.innerHTML = `
     <button class="close" aria-label="Cerrar">✕</button>
     <span class="tag" style="background:${p.color}">${t.name}</span>
@@ -1096,7 +1115,7 @@ function renderFeed(){
       .slice(0, FEED_MAX);
 
     feed.innerHTML = list.map(p=>{
-      const t = TH[p.theme]||TH.otro;
+      const t = TH[p.theme] || TH[FALLBACK_THEME];
       const rawText = String(p.text || "");
       const snippet = rawText.length>74 ? rawText.slice(0,74)+"…" : rawText;
       return `<button data-id="${esc(p.id)}" type="button">
@@ -1420,7 +1439,7 @@ function csv(){
   const rows = [...points]
     .sort((a,b)=> (Number(b.createdAt)||0) - (Number(a.createdAt)||0))
     .map(p=>[
-      new Date(p.createdAt).toISOString(), (TH[p.theme]||TH.otro).name, p.text,
+      new Date(p.createdAt).toISOString(), (TH[p.theme]||TH[FALLBACK_THEME]).name, p.text,
       p.author||"Anónimo", p.contact||"", p.lat, p.lng, p.supports||0].map(esc2).join(","));
   return [head.join(","), ...rows].join("\n");
 }
@@ -1483,12 +1502,26 @@ document.getElementById("shareRow").addEventListener("click", e=>{
   }
 });
 
-/* ══════════════════ PANEL COLAPSABLE (mobile) ══════════════════ */
-const sidePanel = document.getElementById("sidePanel");
-const sideHead  = document.getElementById("sideHead");
+/* ══════════════════ PANEL ÚLTIMOS APORTES (mobile → header) ══════════════════ */
+const sidePanel  = document.getElementById("sidePanel");
+const sideHead   = document.getElementById("sideHead");
+const headerBar  = document.querySelector("header.bar");
+const mapViewEl  = document.getElementById("v-mapa");
+
+function placeSidePanel(){
+  if(!sidePanel || !headerBar || !mapViewEl) return;
+  if(isMobile()){
+    if(sidePanel.parentElement !== headerBar) headerBar.appendChild(sidePanel);
+    sidePanel.classList.add("in-header");
+  }else{
+    if(sidePanel.parentElement !== mapViewEl) mapViewEl.appendChild(sidePanel);
+    sidePanel.classList.remove("in-header");
+  }
+}
 
 function applySideState(){
   if(!sidePanel) return;
+  placeSidePanel();
   if(isMobile()){
     sidePanel.classList.add("collapsed");
   }else{
@@ -1502,11 +1535,15 @@ if(sideHead){
     if(!isMobile()) return;
     if(e.target.closest("#refreshFeed")) return;
     sidePanel.classList.toggle("collapsed");
+    requestAnimationFrame(applyVB);
+    setTimeout(applyVB, 260);
   });
 }
 
 matchMedia("(max-width:760px)").addEventListener("change", ()=>{
   applySideState();
+  requestAnimationFrame(applyVB);
+  setTimeout(applyVB, 260);
 });
 
 /* ══════════════════ TABS + UTILIDADES ══════════════════ */
